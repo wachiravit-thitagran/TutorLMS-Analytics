@@ -57,19 +57,11 @@ class Admin_Menu {
 		$stats['progress_distribution'] = $funnel_provider->get_progress_distribution( $course_id );
 		$stats['quiz_performance']      = $quiz_provider->get_quiz_performance( $course_id );
 		
-		$top_course_id = $course_id;
-		if ( $top_course_id === 0 ) {
-			if ( ! empty( $stats['top_courses'][0]['id'] ) ) {
-				$top_course_id = $stats['top_courses'][0]['id'];
-			} else {
-				global $wpdb;
-				$top_course_id = (int) $wpdb->get_var( "SELECT comment_post_ID FROM {$wpdb->comments} WHERE comment_type = 'tutor_enrolled' GROUP BY comment_post_ID ORDER BY COUNT(comment_ID) DESC LIMIT 1" );
-			}
+		if ( $course_id > 0 ) {
+			$stats['survival_curve'] = $survival_provider->get_survival_curve( $course_id );
+			require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard-single.php';
+		} else {
+			require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard-global.php';
 		}
-		
-		$stats['survival_curve'] = $top_course_id > 0 ? $survival_provider->get_survival_curve( $top_course_id ) : array('labels'=>[], 'data'=>[]);
-		$stats['survival_course_name'] = $top_course_id > 0 ? get_the_title( $top_course_id ) : '';
-		
-		require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard.php';
 	}
 }
