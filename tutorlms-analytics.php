@@ -3,7 +3,7 @@
  * Plugin Name: TutorLMS Analytics
  * Plugin URI: https://example.com
  * Description: In-depth statistics and analytics dashboard for Tutor LMS.
- * Version: 1.0.4
+ * Version: 1.0.5
  * Author: BIA
  * Text Domain: tutorlms-analytics
  *
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'TUTORLMS_ANALYTICS_VERSION' ) ) {
-	define( 'TUTORLMS_ANALYTICS_VERSION', '1.0.4' );
+	define( 'TUTORLMS_ANALYTICS_VERSION', '1.0.5' );
 }
 if ( ! defined( 'TUTORLMS_ANALYTICS_DIR' ) ) {
 	define( 'TUTORLMS_ANALYTICS_DIR', plugin_dir_path( __FILE__ ) );
