@@ -18,22 +18,22 @@ $course_title = get_the_title( $course_id );
 	<div class="mb-6 mt-4 flex flex-col gap-2">
 		<div>
 			<a href="<?php echo esc_url( admin_url( 'admin.php?page=tutorlms-analytics' ) ); ?>" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
-				<i class="ti ti-arrow-left mr-1"></i> Back to Global Overview
+				<i class="ti ti-arrow-left mr-1"></i> กลับไปหน้าภาพรวม
 			</a>
 		</div>
 		<h1 class="!text-3xl !font-bold !m-0 text-gray-800 flex items-center gap-3">
 			<?php echo esc_html( $course_title ); ?>
-			<span class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium tracking-wide">Course Analytics</span>
+			<span class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium tracking-wide">สถิติรายคอร์ส</span>
 		</h1>
 	</div>
 	
 	<!-- Tabs Navigation -->
 	<div class="border-b border-gray-200 mb-6 bg-white rounded-t-lg px-4 pt-4 shadow-sm">
 		<nav class="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
-			<a href="#" @click.prevent="tab = 'insights'" :class="tab === 'insights' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">Learning Insights</a>
-			<a href="#" @click.prevent="tab = 'learners'" :class="tab === 'learners' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">Students Roster</a>
+			<a href="#" @click.prevent="tab = 'insights'" :class="tab === 'insights' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">ข้อมูลเชิงลึกการเรียนรู้</a>
+			<a href="#" @click.prevent="tab = 'learners'" :class="tab === 'learners' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">รายชื่อผู้เรียน</a>
 			<a href="#" @click.prevent="tab = 'alerts'" :class="tab === 'alerts' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
-				Action Center
+				ศูนย์จัดการ (Action Center)
 				<?php if ( ! empty( $stats['alerts'] ) ) : ?>
 					<span class="bg-red-100 text-red-600 ml-1 py-0.5 px-2 rounded-full text-xs"><?php echo count( $stats['alerts'] ); ?></span>
 				<?php endif; ?>
@@ -46,19 +46,19 @@ $course_title = get_the_title( $course_id );
 		<!-- Highlight Cards -->
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 border-l-4 border-l-blue-500">
-				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Enrolled Students</h3>
+				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">ผู้เรียนที่สมัคร</h3>
 				<p class="text-2xl font-bold text-gray-900"><?php echo number_format( $stats['total_students'] ); ?></p>
 			</div>
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 border-l-4 border-l-green-500">
-				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Completion Rate</h3>
+				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">อัตราการเรียนจบ</h3>
 				<p class="text-2xl font-bold text-gray-900"><?php echo esc_html( $stats['course_performance'][0]['completion_rate'] ?? 0 ); ?>%</p>
 			</div>
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 border-l-4 border-l-yellow-500">
-				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Avg Quiz Score</h3>
+				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">คะแนนควิซเฉลี่ย</h3>
 				<p class="text-2xl font-bold text-gray-900"><?php echo esc_html( $stats['quiz_performance']['avg_score'] ?? 0 ); ?>%</p>
 			</div>
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 border-l-4 border-l-red-500">
-				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Avg Drop-off Rate</h3>
+				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">อัตราการทิ้งคอร์ส</h3>
 				<?php 
 					$survival_data = $stats['survival_curve']['data'] ?? [];
 					$drop_off = 0;
@@ -74,17 +74,17 @@ $course_title = get_the_title( $course_id );
 		<!-- Deep Insights Charts -->
 		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 relative">
-				<div class="absolute top-4 right-4 bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded font-medium">Critical Metric</div>
-				<h3 class="text-lg font-semibold text-gray-800 mb-1">Kaplan-Meier Survival Curve</h3>
-				<p class="text-sm text-gray-500 mb-4">Shows exactly where students drop off. A steep drop means content is too hard or boring.</p>
+				<div class="absolute top-4 right-4 bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded font-medium">สถิติสำคัญ</div>
+				<h3 class="text-lg font-semibold text-gray-800 mb-1">กราฟการเรียนต่อ (Survival Curve)</h3>
+				<p class="text-sm text-gray-500 mb-4">แสดงจุดที่ผู้เรียนทิ้งคอร์ส หากกราฟตกชันมาก อาจแปลว่าเนื้อหานั้นยากหรือน่าเบื่อเกินไป</p>
 				<div class="relative h-72 w-full">
 					<canvas id="survivalChart"></canvas>
 				</div>
 			</div>
 			
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-				<h3 class="text-lg font-semibold text-gray-800 mb-1">Progress Distribution</h3>
-				<p class="text-sm text-gray-500 mb-4">Breakdown of current student progress statuses.</p>
+				<h3 class="text-lg font-semibold text-gray-800 mb-1">สัดส่วนความคืบหน้า</h3>
+				<p class="text-sm text-gray-500 mb-4">การกระจายตัวของสถานะการเรียนปัจจุบัน</p>
 				<div class="relative h-72 w-full">
 					<canvas id="progressChart"></canvas>
 				</div>
@@ -95,16 +95,16 @@ $course_title = get_the_title( $course_id );
 	<!-- TAB 2: Learners -->
 	<div x-show="tab === 'learners'" x-cloak class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
 		<div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-			<h3 class="text-lg font-semibold text-gray-800">Student Progress Roster</h3>
+			<h3 class="text-lg font-semibold text-gray-800">ตารางความคืบหน้าของผู้เรียน</h3>
 		</div>
 		<div class="overflow-x-auto">
 			<table class="min-w-full divide-y divide-gray-200">
 				<thead class="bg-gray-50">
 					<tr>
-						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
-						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-						<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
-						<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</th>
+						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้เรียน</th>
+						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
+						<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">ความคืบหน้า</th>
+						<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">เข้าเรียนล่าสุด</th>
 					</tr>
 				</thead>
 				<tbody class="bg-white divide-y divide-gray-200">
@@ -139,11 +139,11 @@ $course_title = get_the_title( $course_id );
 
 	<!-- TAB 3: Alerts -->
 	<div x-show="tab === 'alerts'" x-cloak>
-		<h3 class="text-lg font-semibold text-gray-800 mb-4">Action Center for <?php echo esc_html( $course_title ); ?></h3>
+		<h3 class="text-lg font-semibold text-gray-800 mb-4">ศูนย์จัดการสำหรับ <?php echo esc_html( $course_title ); ?></h3>
 		<?php if ( empty( $stats['alerts'] ) ) : ?>
 			<div class="bg-green-50 text-green-800 p-4 rounded-lg flex items-center gap-3">
 				<i class="ti ti-check text-xl"></i>
-				<span>All clear! No pending alerts or high drop-off points detected for this course.</span>
+				<span>ยอดเยี่ยม! ไม่พบปัญหาหรือจุดที่มีคนทิ้งคอร์สเยอะในคอร์สนี้</span>
 			</div>
 		<?php else : ?>
 			<div class="grid grid-cols-1 gap-4">
@@ -163,7 +163,7 @@ $course_title = get_the_title( $course_id );
 							</div>
 						</div>
 						<a href="<?php echo esc_url( $alert['action'] ); ?>" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium rounded transition">
-							Take Action
+							จัดการเลย
 						</a>
 					</div>
 				<?php endforeach; ?>
