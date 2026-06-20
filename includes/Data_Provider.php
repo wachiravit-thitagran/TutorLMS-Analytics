@@ -24,6 +24,8 @@ class Data_Provider {
 			'top_courses'           => $this->get_top_courses_by_enrollment( $course_id ),
 			'completion_trend'      => $this->get_daily_completions_30_days( $course_id ),
 			'active_students_trend' => $this->get_daily_active_students_30_days( $course_id ),
+			'course_popularity'     => $course_id === 0 ? $this->get_course_popularity() : [],
+			'activity_by_day'       => $this->get_activity_by_day_of_week( $course_id ),
 		);
 	}
 
@@ -160,5 +162,72 @@ class Data_Provider {
 			);
 		}
 		return $top;
+	}
+
+	private function get_course_popularity(): array {
+		global $wpdb;
+		
+		$query = "
+			SELECT comment_post_ID as course_id, COUNT(comment_ID) as count
+			FROM {$wpdb->comments}
+			WHERE comment_type = 'tutor_enrolled' AND comment_approved = 'approved'
+			GROUP BY comment_post_ID
+			ORDER BY count DESC
+		";
+		$results = $wpdb->get_results( $query, ARRAY_A );
+		
+		$popularity = array();
+		foreach ( (array) $results as $row ) {
+			$course_title = get_the_title( $row['course_id'] );
+			if ( $course_title ) {
+				$popularity[ $course_title ] = (int) $row['count'];
+			}
+		}
+		
+		// If more than 6, group others
+		if ( count( $popularity ) > 6 ) {
+			$top = array_slice( $popularity, 0, 5, true );
+			$others_sum = array_sum( array_slice( $popularity, 5 ) );
+			$top['อื่นๆ (Others)'] = $others_sum;
+			return $top;
+		}
+		
+		return $popularity;
+	}
+
+	private function get_activity_by_day_of_week( int $course_id ): array {
+		global $wpdb;
+		
+		$types = "'tutor_enrolled', 'course_completed', 'lesson_completed', 'tutor_quiz_attempt', 'assignment_submitted'";
+		$where = "comment_type IN ($types) AND comment_approved = 'approved' AND comment_date >= DATE_SUB(NOW(), INTERVAL 90 DAY)";
+		if ( $course_id > 0 ) {
+			$where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
+		}
+
+		$query = "
+			SELECT DAYOFWEEK(comment_date) as day_num, COUNT(comment_ID) as count
+			FROM {$wpdb->comments}
+			WHERE {$where}
+			GROUP BY DAYOFWEEK(comment_date)
+		";
+		$results = $wpdb->get_results( $query, ARRAY_A );
+		
+		$days_map = array(
+			1 => 'อาทิตย์',
+			2 => 'จันทร์',
+			3 => 'อังคาร',
+			4 => 'พุธ',
+			5 => 'พฤหัสบดี',
+			6 => 'ศุกร์',
+			7 => 'เสาร์',
+		);
+		
+		$data = array_fill_keys( array_values( $days_map ), 0 );
+		foreach ( (array) $results as $row ) {
+			$day_name = $days_map[ (int) $row['day_num'] ];
+			$data[ $day_name ] = (int) $row['count'];
+		}
+		
+		return $data;
 	}
 }

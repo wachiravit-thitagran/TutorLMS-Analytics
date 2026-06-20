@@ -58,7 +58,9 @@ class Admin_Menu {
 		$stats['quiz_performance']      = $quiz_provider->get_quiz_performance( $course_id );
 		
 		if ( $course_id > 0 ) {
-			$stats['survival_curve'] = $survival_provider->get_survival_curve( $course_id );
+			$stats['survival_curve']          = $survival_provider->get_survival_curve( $course_id );
+			$stats['quiz_score_distribution'] = $quiz_provider->get_quiz_score_distribution( $course_id );
+			$stats['pass_fail_ratio']         = $quiz_provider->get_pass_fail_ratio( $course_id );
 			require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard-single.php';
 		} else {
 			require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard-global.php';

@@ -91,6 +91,25 @@ $course_title = get_the_title( $course_id );
 			</div>
 		</div>
 
+		<!-- Quiz Performance Charts -->
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+				<h3 class="text-lg font-semibold text-gray-800 mb-1">การกระจายตัวของคะแนนสอบ</h3>
+				<p class="text-sm text-gray-500 mb-4">แสดงผลคะแนนควิซเพื่อวัดระดับความยากง่ายของข้อสอบ</p>
+				<div class="relative h-72 w-full">
+					<canvas id="quizScoreDistributionChart"></canvas>
+				</div>
+			</div>
+			
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+				<h3 class="text-lg font-semibold text-gray-800 mb-1">สัดส่วนการสอบผ่าน/ตก</h3>
+				<p class="text-sm text-gray-500 mb-4">แสดงอัตราการสอบผ่านเมื่อเทียบกับการเข้าสอบทั้งหมด</p>
+				<div class="relative h-72 w-full">
+					<canvas id="passFailRatioChart"></canvas>
+				</div>
+			</div>
+		</div>
+
 		<!-- Daily Trends Charts -->
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 			<!-- Enrollment Graph -->
@@ -230,6 +249,39 @@ document.addEventListener('DOMContentLoaded', function() {
 				datasets: [{
 					data: Object.values(progData),
 					backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'],
+				}]
+			},
+			options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+		});
+	}
+
+	// Quiz Score Distribution Chart
+	const quizDistData = <?php echo wp_json_encode( $stats['quiz_score_distribution'] ?? [] ); ?>;
+	if(document.getElementById('quizScoreDistributionChart') && Object.keys(quizDistData).length > 0) {
+		new Chart(document.getElementById('quizScoreDistributionChart').getContext('2d'), {
+			type: 'bar',
+			data: {
+				labels: Object.keys(quizDistData),
+				datasets: [{
+					label: 'จำนวนผู้เข้าสอบ',
+					data: Object.values(quizDistData),
+					backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'],
+				}]
+			},
+			options: { responsive: true, maintainAspectRatio: false }
+		});
+	}
+
+	// Pass/Fail Ratio Chart
+	const passFailData = <?php echo wp_json_encode( $stats['pass_fail_ratio'] ?? [] ); ?>;
+	if(document.getElementById('passFailRatioChart') && Object.keys(passFailData).length > 0) {
+		new Chart(document.getElementById('passFailRatioChart').getContext('2d'), {
+			type: 'doughnut',
+			data: {
+				labels: Object.keys(passFailData),
+				datasets: [{
+					data: Object.values(passFailData),
+					backgroundColor: ['#10b981', '#ef4444'], // Green for Pass, Red for Fail
 				}]
 			},
 			options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
