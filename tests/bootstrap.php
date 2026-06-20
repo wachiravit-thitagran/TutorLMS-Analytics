@@ -38,6 +38,9 @@ if ( ! function_exists( 'plugins_url' ) ) {
 if ( ! function_exists( 'plugin_dir_path' ) ) {
 	function plugin_dir_path( $file ) { return TUTORLMS_ANALYTICS_DIR; }
 }
+if ( ! function_exists( 'plugin_dir_url' ) ) {
+	function plugin_dir_url( $file ) { return TUTORLMS_ANALYTICS_URL; }
+}
 
 // Load the main plugin file
 require dirname( __DIR__ ) . '/tutorlms-analytics.php';
