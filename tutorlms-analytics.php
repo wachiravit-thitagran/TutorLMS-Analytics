@@ -74,7 +74,9 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
 function enqueue_tracker() {
 	// Only run on course/lesson/quiz pages
 	if ( is_singular( array( 'courses', 'lesson', 'tutor_quiz' ) ) ) {
-		wp_enqueue_script( 'tutorlms-analytics-tracker', TUTORLMS_ANALYTICS_URL . 'assets/tracker.js', array(), TUTORLMS_ANALYTICS_VERSION, true );
+		$tracker_path = TUTORLMS_ANALYTICS_DIR . 'assets/tracker.js';
+		$version      = file_exists( $tracker_path ) ? filemtime( $tracker_path ) : TUTORLMS_ANALYTICS_VERSION;
+		wp_enqueue_script( 'tutorlms-analytics-tracker', TUTORLMS_ANALYTICS_URL . 'assets/tracker.js', array(), $version, true );
 		wp_localize_script( 'tutorlms-analytics-tracker', 'TutorLMSAnalyticsData', array(
 			'rest_url'  => esc_url_raw( rest_url( 'tutor-analytics/v1/track' ) ),
 			'nonce'     => wp_create_nonce( 'wp_rest' ),
