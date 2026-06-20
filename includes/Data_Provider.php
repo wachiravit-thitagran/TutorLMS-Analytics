@@ -20,8 +20,10 @@ class Data_Provider {
 		return array(
 			'total_students'      => $this->get_total_enrolled_students( $course_id ),
 			'total_completions'   => $this->get_total_course_completions( $course_id ),
-			'enrollment_trend'    => $this->get_enrollment_trend_30_days( $course_id ),
-			'top_courses'         => $this->get_top_courses_by_enrollment( $course_id ),
+			'enrollment_trend'      => $this->get_enrollment_trend_30_days( $course_id ),
+			'top_courses'           => $this->get_top_courses_by_enrollment( $course_id ),
+			'completion_trend'      => $this->get_daily_completions_30_days( $course_id ),
+			'active_students_trend' => $this->get_daily_active_students_30_days( $course_id ),
 		);
 	}
 
@@ -55,6 +57,63 @@ class Data_Provider {
 
 		$query = "
 			SELECT DATE(comment_date) as date, COUNT(comment_ID) as count
+			FROM {$wpdb->comments}
+			WHERE {$where}
+			GROUP BY DATE(comment_date)
+			ORDER BY DATE(comment_date) ASC
+		";
+		$results = $wpdb->get_results( $query, ARRAY_A );
+		
+		$trend = array(
+			'labels' => array(),
+			'data'   => array(),
+		);
+		foreach ( (array) $results as $row ) {
+			$trend['labels'][] = $row['date'];
+			$trend['data'][]   = (int) $row['count'];
+		}
+		return $trend;
+	}
+
+	private function get_daily_completions_30_days( int $course_id ): array {
+		global $wpdb;
+		
+		$where = "comment_type = 'course_completed' AND comment_approved = 'approved' AND comment_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+		if ( $course_id > 0 ) {
+			$where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
+		}
+
+		$query = "
+			SELECT DATE(comment_date) as date, COUNT(comment_ID) as count
+			FROM {$wpdb->comments}
+			WHERE {$where}
+			GROUP BY DATE(comment_date)
+			ORDER BY DATE(comment_date) ASC
+		";
+		$results = $wpdb->get_results( $query, ARRAY_A );
+		
+		$trend = array(
+			'labels' => array(),
+			'data'   => array(),
+		);
+		foreach ( (array) $results as $row ) {
+			$trend['labels'][] = $row['date'];
+			$trend['data'][]   = (int) $row['count'];
+		}
+		return $trend;
+	}
+
+	private function get_daily_active_students_30_days( int $course_id ): array {
+		global $wpdb;
+		
+		$types = "'tutor_enrolled', 'course_completed', 'lesson_completed', 'tutor_quiz_attempt', 'assignment_submitted'";
+		$where = "comment_type IN ($types) AND comment_approved = 'approved' AND user_id > 0 AND comment_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+		if ( $course_id > 0 ) {
+			$where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
+		}
+
+		$query = "
+			SELECT DATE(comment_date) as date, COUNT(DISTINCT user_id) as count
 			FROM {$wpdb->comments}
 			WHERE {$where}
 			GROUP BY DATE(comment_date)
