@@ -28,6 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<nav class="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
 			<a href="#" @click.prevent="tab = 'overview'" :class="tab === 'overview' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">ภาพรวม (Overview)</a>
 			<a href="#" @click.prevent="tab = 'courses'" :class="tab === 'courses' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">ประสิทธิภาพคอร์ส</a>
+			<a href="#" @click.prevent="tab = 'revenue'" :class="tab === 'revenue' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">รายได้ (Revenue)</a>
 			<a href="#" @click.prevent="tab = 'export'" :class="tab === 'export' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">ส่งออกข้อมูล</a>
 		</nav>
 	</div>
@@ -73,6 +74,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<h3 class="text-lg font-semibold text-gray-800 mb-4">ผู้ที่เรียนจบ (30 วัน)</h3>
 				<div class="relative h-72 w-full">
 					<canvas id="completionTrendChart"></canvas>
+				</div>
+			</div>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+			<!-- Course Popularity Graph -->
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+				<h3 class="text-lg font-semibold text-gray-800 mb-4">สัดส่วนความนิยมของคอร์ส</h3>
+				<div class="relative h-72 w-full">
+					<canvas id="coursePopularityChart"></canvas>
+				</div>
+			</div>
+			<!-- Activity by Day Graph -->
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+				<h3 class="text-lg font-semibold text-gray-800 mb-4">ความเคลื่อนไหวแยกตามวัน (90 วัน)</h3>
+				<div class="relative h-72 w-full">
+					<canvas id="activityByDayChart"></canvas>
 				</div>
 			</div>
 		</div>
@@ -141,6 +159,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 		</div>
 	</div>
+
+	<!-- TAB 4: Revenue -->
+	<div x-show="tab === 'revenue'" x-cloak>
+		<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
+			<h3 class="text-lg font-semibold text-gray-800 mb-4">แนวโน้มรายได้ (30 วันล่าสุด)</h3>
+			<div class="relative h-80 w-full">
+				<canvas id="revenueTrendChart"></canvas>
+			</div>
+		</div>
+	</div>
 </div>
 
 <style>[x-cloak] { display: none !important; }</style>
@@ -196,6 +224,58 @@ document.addEventListener('DOMContentLoaded', function() {
 					label: 'ผู้ที่เรียนจบ',
 					data: compData.data,
 					backgroundColor: 'rgba(16, 185, 129, 0.8)',
+				}]
+			},
+			options: { responsive: true, maintainAspectRatio: false }
+		});
+	}
+
+	// Course Popularity Chart
+	const popData = <?php echo wp_json_encode( $stats['course_popularity'] ?? [] ); ?>;
+	if(document.getElementById('coursePopularityChart') && Object.keys(popData).length > 0) {
+		new Chart(document.getElementById('coursePopularityChart').getContext('2d'), {
+			type: 'doughnut',
+			data: {
+				labels: Object.keys(popData),
+				datasets: [{
+					data: Object.values(popData),
+					backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6b7280'],
+				}]
+			},
+			options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+		});
+	}
+
+	// Activity by Day Chart
+	const actDayData = <?php echo wp_json_encode( $stats['activity_by_day'] ?? [] ); ?>;
+	if(document.getElementById('activityByDayChart') && Object.keys(actDayData).length > 0) {
+		new Chart(document.getElementById('activityByDayChart').getContext('2d'), {
+			type: 'bar',
+			data: {
+				labels: Object.keys(actDayData),
+				datasets: [{
+					label: 'กิจกรรม',
+					data: Object.values(actDayData),
+					backgroundColor: 'rgba(139, 92, 246, 0.8)',
+				}]
+			},
+			options: { responsive: true, maintainAspectRatio: false }
+		});
+	}
+
+	// Revenue Trend Chart
+	const revData = <?php echo wp_json_encode( $stats['revenue']['trend'] ?? array('labels'=>[], 'data'=>[]) ); ?>;
+	if(document.getElementById('revenueTrendChart') && revData.labels && revData.labels.length > 0) {
+		new Chart(document.getElementById('revenueTrendChart').getContext('2d'), {
+			type: 'line',
+			data: {
+				labels: revData.labels,
+				datasets: [{
+					label: 'รายได้ (THB)',
+					data: revData.data,
+					borderColor: 'rgb(16, 185, 129)',
+					backgroundColor: 'rgba(16, 185, 129, 0.1)',
+					borderWidth: 2, fill: true, tension: 0.3
 				}]
 			},
 			options: { responsive: true, maintainAspectRatio: false }
