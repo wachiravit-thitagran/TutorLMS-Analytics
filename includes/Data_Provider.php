@@ -31,11 +31,11 @@ class Data_Provider {
 
 	private function get_total_enrolled_students( int $course_id ): int {
 		global $wpdb;
-		$where = "comment_type = 'tutor_enrolled' AND comment_approved = 'approved'";
+		$where = "post_type = 'tutor_enrolled' AND post_status IN ('completed', 'processing', 'publish')";
 		if ( $course_id > 0 ) {
-			$where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
+			$where .= $wpdb->prepare( " AND post_parent = %d", $course_id );
 		}
-		$count = $wpdb->get_var( "SELECT COUNT(DISTINCT user_id) FROM {$wpdb->comments} WHERE {$where}" );
+		$count = $wpdb->get_var( "SELECT COUNT(DISTINCT post_author) FROM {$wpdb->posts} WHERE {$where}" );
 		return (int) $count;
 	}
 
@@ -52,17 +52,17 @@ class Data_Provider {
 	private function get_enrollment_trend_30_days( int $course_id ): array {
 		global $wpdb;
 		
-		$where = "comment_type = 'tutor_enrolled' AND comment_approved = 'approved' AND comment_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+		$where = "post_type = 'tutor_enrolled' AND post_status IN ('completed', 'processing', 'publish') AND post_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
 		if ( $course_id > 0 ) {
-			$where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
+			$where .= $wpdb->prepare( " AND post_parent = %d", $course_id );
 		}
 
 		$query = "
-			SELECT DATE(comment_date) as date, COUNT(comment_ID) as count
-			FROM {$wpdb->comments}
+			SELECT DATE(post_date) as date, COUNT(ID) as count
+			FROM {$wpdb->posts}
 			WHERE {$where}
-			GROUP BY DATE(comment_date)
-			ORDER BY DATE(comment_date) ASC
+			GROUP BY DATE(post_date)
+			ORDER BY DATE(post_date) ASC
 		";
 		$results = $wpdb->get_results( $query, ARRAY_A );
 		
@@ -108,7 +108,7 @@ class Data_Provider {
 	private function get_daily_active_students_30_days( int $course_id ): array {
 		global $wpdb;
 		
-		$types = "'tutor_enrolled', 'course_completed', 'lesson_completed', 'tutor_quiz_attempt', 'assignment_submitted'";
+		$types = "'course_completed', 'lesson_completed', 'tutor_quiz_attempt', 'assignment_submitted'";
 		$where = "comment_type IN ($types) AND comment_approved = 'approved' AND user_id > 0 AND comment_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
 		if ( $course_id > 0 ) {
 			$where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
@@ -137,16 +137,16 @@ class Data_Provider {
 	private function get_top_courses_by_enrollment( int $course_id ): array {
 		global $wpdb;
 		
-		$where = "comment_type = 'tutor_enrolled' AND comment_approved = 'approved'";
+		$where = "post_type = 'tutor_enrolled' AND post_status IN ('completed', 'processing', 'publish')";
 		if ( $course_id > 0 ) {
-			$where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
+			$where .= $wpdb->prepare( " AND post_parent = %d", $course_id );
 		}
 
 		$query = "
-			SELECT comment_post_ID as course_id, COUNT(comment_ID) as count
-			FROM {$wpdb->comments}
+			SELECT post_parent as course_id, COUNT(ID) as count
+			FROM {$wpdb->posts}
 			WHERE {$where}
-			GROUP BY comment_post_ID
+			GROUP BY post_parent
 			ORDER BY count DESC
 			LIMIT 5
 		";
@@ -168,10 +168,10 @@ class Data_Provider {
 		global $wpdb;
 		
 		$query = "
-			SELECT comment_post_ID as course_id, COUNT(comment_ID) as count
-			FROM {$wpdb->comments}
-			WHERE comment_type = 'tutor_enrolled' AND comment_approved = 'approved'
-			GROUP BY comment_post_ID
+			SELECT post_parent as course_id, COUNT(ID) as count
+			FROM {$wpdb->posts}
+			WHERE post_type = 'tutor_enrolled' AND post_status IN ('completed', 'processing', 'publish')
+			GROUP BY post_parent
 			ORDER BY count DESC
 		";
 		$results = $wpdb->get_results( $query, ARRAY_A );
@@ -198,7 +198,7 @@ class Data_Provider {
 	private function get_activity_by_day_of_week( int $course_id ): array {
 		global $wpdb;
 		
-		$types = "'tutor_enrolled', 'course_completed', 'lesson_completed', 'tutor_quiz_attempt', 'assignment_submitted'";
+		$types = "'course_completed', 'lesson_completed', 'tutor_quiz_attempt', 'assignment_submitted'";
 		$where = "comment_type IN ($types) AND comment_approved = 'approved' AND comment_date >= DATE_SUB(NOW(), INTERVAL 90 DAY)";
 		if ( $course_id > 0 ) {
 			$where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );

@@ -12,20 +12,20 @@ class Student_Provider {
 		global $wpdb;
 
 		// Get latest enrolled users
-		$where = "c.comment_type = 'tutor_enrolled' AND c.comment_approved = 'approved'";
+		$where = "p.post_type = 'tutor_enrolled' AND p.post_status IN ('completed', 'processing', 'publish')";
 		if ( $course_id > 0 ) {
-			$where .= $wpdb->prepare( " AND c.comment_post_ID = %d", $course_id );
+			$where .= $wpdb->prepare( " AND p.post_parent = %d", $course_id );
 		}
 
 		// We use a subquery or group by to get unique users and their latest enrollment date
 		$query = "
 			SELECT 
-				c.user_id, 
-				MAX(c.comment_date) as last_enrolled,
-				COUNT(DISTINCT c.comment_post_ID) as courses_taken
-			FROM {$wpdb->comments} c
+				p.post_author as user_id, 
+				MAX(p.post_date) as last_enrolled,
+				COUNT(DISTINCT p.post_parent) as courses_taken
+			FROM {$wpdb->posts} p
 			WHERE {$where}
-			GROUP BY c.user_id
+			GROUP BY p.post_author
 			ORDER BY last_enrolled DESC
 			LIMIT %d
 		";

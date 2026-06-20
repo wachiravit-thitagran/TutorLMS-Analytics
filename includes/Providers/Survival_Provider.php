@@ -26,9 +26,9 @@ class Survival_Provider {
 
 		// 2. Count total enrolled students for this course
 		$total_enrolled = (int) $wpdb->get_var( $wpdb->prepare( "
-			SELECT COUNT(DISTINCT user_id) 
-			FROM {$wpdb->comments} 
-			WHERE comment_post_ID = %d AND comment_type = 'tutor_enrolled' AND comment_approved = 'approved'
+			SELECT COUNT(DISTINCT post_author) 
+			FROM {$wpdb->posts} 
+			WHERE post_parent = %d AND post_type = 'tutor_enrolled' AND post_status IN ('completed', 'processing', 'publish')
 		", $course_id ) );
 
 		if ( $total_enrolled === 0 ) {
