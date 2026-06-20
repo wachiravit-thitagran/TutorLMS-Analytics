@@ -71,7 +71,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
 				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Avg Global Rating</h3>
-				<p class="text-2xl font-bold text-yellow-500">⭐ <?php echo esc_html( $stats['quiz_performance']['avg_score'] > 0 ? 'Active' : 'N/A' ); ?></p>
+				<p class="text-2xl font-bold text-yellow-500"><i class="ti ti-star-filled text-yellow-500"></i> <?php echo esc_html( $stats['quiz_performance']['avg_score'] > 0 ? 'Active' : 'N/A' ); ?></p>
 			</div>
 		</div>
 
@@ -122,7 +122,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right"><?php echo esc_html( number_format( $cp['learners'] ) ); ?></td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right"><?php echo esc_html( $cp['completion_rate'] ); ?>%</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">⭐ <?php echo esc_html( $cp['avg_rating'] ); ?></td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right"><i class="ti ti-star-filled text-yellow-400"></i> <?php echo esc_html( $cp['avg_rating'] ); ?></td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium text-right">฿<?php echo esc_html( number_format( $cp['revenue'] ) ); ?></td>
 					</tr>
 					<?php endforeach; ?>
@@ -216,17 +216,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h3 class="text-lg font-semibold text-gray-800 mb-4">Export Analytics (CSV)</h3>
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 				<a href="<?php echo esc_url( admin_url( 'admin-post.php?action=tutorlms_export_revenue' ) ); ?>" class="text-center block border border-gray-200 rounded-lg p-6 hover:bg-blue-50 transition cursor-pointer">
-					<span class="block text-2xl mb-2">💰</span>
+					<span class="block text-2xl mb-2 text-green-600"><i class="ti ti-report-money"></i></span>
 					<span class="font-medium text-gray-900 block">Revenue Report</span>
 					<span class="text-xs text-gray-500">Last 30 Days</span>
 				</a>
 				<a href="<?php echo esc_url( admin_url( 'admin-post.php?action=tutorlms_export_courses' ) ); ?>" class="text-center block border border-gray-200 rounded-lg p-6 hover:bg-blue-50 transition cursor-pointer">
-					<span class="block text-2xl mb-2">📚</span>
+					<span class="block text-2xl mb-2 text-indigo-600"><i class="ti ti-books"></i></span>
 					<span class="font-medium text-gray-900 block">Course Performance</span>
 					<span class="text-xs text-gray-500">All published courses</span>
 				</a>
 				<a href="<?php echo esc_url( admin_url( 'admin-post.php?action=tutorlms_export_students' ) ); ?>" class="text-center block border border-gray-200 rounded-lg p-6 hover:bg-blue-50 transition cursor-pointer">
-					<span class="block text-2xl mb-2">👨‍🎓</span>
+					<span class="block text-2xl mb-2 text-orange-600"><i class="ti ti-school"></i></span>
 					<span class="font-medium text-gray-900 block">Student Roster</span>
 					<span class="text-xs text-gray-500">Progress & Status</span>
 				</a>

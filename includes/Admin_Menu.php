@@ -25,9 +25,10 @@ class Admin_Menu {
 			return;
 		}
 
-		// Enqueue Chart.js and Tailwind via CDN for rapid admin UI.
+		// Enqueue Chart.js, Tailwind, and Tabler Icons via CDN for rapid admin UI.
 		wp_enqueue_script( 'chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', array(), '4.4.0', true );
 		wp_enqueue_script( 'tailwindcss', 'https://cdn.tailwindcss.com', array(), '3.4.0', false );
+		wp_enqueue_style( 'tabler-icons', 'https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css', array(), 'latest' );
 	}
 
 	public function render_page(): void {
