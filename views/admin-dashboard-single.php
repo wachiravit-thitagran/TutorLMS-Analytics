@@ -15,11 +15,13 @@ $course_title = get_the_title( $course_id );
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="wrap" x-data="{ tab: 'insights' }">
-	<div class="mb-6 mt-4">
-		<a href="<?php echo esc_url( admin_url( 'admin.php?page=tutorlms-analytics' ) ); ?>" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 mb-2">
-			<i class="ti ti-arrow-left mr-1"></i> Back to Global Overview
-		</a>
-		<h1 class="wp-heading-inline !text-3xl !font-bold !m-0 text-gray-800 flex items-center gap-3">
+	<div class="mb-6 mt-4 flex flex-col gap-2">
+		<div>
+			<a href="<?php echo esc_url( admin_url( 'admin.php?page=tutorlms-analytics' ) ); ?>" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
+				<i class="ti ti-arrow-left mr-1"></i> Back to Global Overview
+			</a>
+		</div>
+		<h1 class="!text-3xl !font-bold !m-0 text-gray-800 flex items-center gap-3">
 			<?php echo esc_html( $course_title ); ?>
 			<span class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium tracking-wide">Course Analytics</span>
 		</h1>
