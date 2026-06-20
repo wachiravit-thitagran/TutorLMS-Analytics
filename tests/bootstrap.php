@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'TUTORLMS_ANALYTICS_VERSION' ) ) {
-	define( 'TUTORLMS_ANALYTICS_VERSION', '1.0.5' );
+	define( 'TUTORLMS_ANALYTICS_VERSION', '1.0.6' );
 }
 
 if ( ! defined( 'TUTORLMS_ANALYTICS_DIR' ) ) {

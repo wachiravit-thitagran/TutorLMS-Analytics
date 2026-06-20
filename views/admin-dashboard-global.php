@@ -53,12 +53,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 		</div>
 
-		<div class="grid grid-cols-1 gap-6 mb-6">
+		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 			<!-- Enrollment Graph -->
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
 				<h3 class="text-lg font-semibold text-gray-800 mb-4">แนวโน้มการสมัครเรียน (30 วัน)</h3>
 				<div class="relative h-72 w-full">
 					<canvas id="enrollmentTrendChart"></canvas>
+				</div>
+			</div>
+			<!-- Active Students Graph -->
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+				<h3 class="text-lg font-semibold text-gray-800 mb-4">นักเรียนที่เข้าเรียน (Active 30 วัน)</h3>
+				<div class="relative h-72 w-full">
+					<canvas id="activeStudentsTrendChart"></canvas>
+				</div>
+			</div>
+			<!-- Completion Graph -->
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+				<h3 class="text-lg font-semibold text-gray-800 mb-4">ผู้ที่เรียนจบ (30 วัน)</h3>
+				<div class="relative h-72 w-full">
+					<canvas id="completionTrendChart"></canvas>
 				</div>
 			</div>
 		</div>
@@ -146,6 +160,42 @@ document.addEventListener('DOMContentLoaded', function() {
 					borderColor: 'rgb(59, 130, 246)',
 					backgroundColor: 'rgba(59, 130, 246, 0.1)',
 					borderWidth: 2, fill: true, tension: 0.3
+				}]
+			},
+			options: { responsive: true, maintainAspectRatio: false }
+		});
+	}
+
+	// Active Students Chart
+	const actData = <?php echo wp_json_encode( $stats['active_students_trend'] ?? array('labels'=>[], 'data'=>[]) ); ?>;
+	if(document.getElementById('activeStudentsTrendChart') && actData.labels) {
+		new Chart(document.getElementById('activeStudentsTrendChart').getContext('2d'), {
+			type: 'line',
+			data: {
+				labels: actData.labels,
+				datasets: [{
+					label: 'ผู้เข้าเรียน (Active)',
+					data: actData.data,
+					borderColor: 'rgb(245, 158, 11)',
+					backgroundColor: 'rgba(245, 158, 11, 0.1)',
+					borderWidth: 2, fill: true, tension: 0.3
+				}]
+			},
+			options: { responsive: true, maintainAspectRatio: false }
+		});
+	}
+
+	// Completion Chart
+	const compData = <?php echo wp_json_encode( $stats['completion_trend'] ?? array('labels'=>[], 'data'=>[]) ); ?>;
+	if(document.getElementById('completionTrendChart') && compData.labels) {
+		new Chart(document.getElementById('completionTrendChart').getContext('2d'), {
+			type: 'bar',
+			data: {
+				labels: compData.labels,
+				datasets: [{
+					label: 'ผู้ที่เรียนจบ',
+					data: compData.data,
+					backgroundColor: 'rgba(16, 185, 129, 0.8)',
 				}]
 			},
 			options: { responsive: true, maintainAspectRatio: false }
