@@ -18,9 +18,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'TUTORLMS_ANALYTICS_VERSION', '1.0.0' );
-define( 'TUTORLMS_ANALYTICS_DIR', plugin_dir_path( __FILE__ ) );
-define( 'TUTORLMS_ANALYTICS_URL', plugin_dir_url( __FILE__ ) );
+if ( ! defined( 'TUTORLMS_ANALYTICS_VERSION' ) ) {
+	define( 'TUTORLMS_ANALYTICS_VERSION', '1.0.0' );
+}
+if ( ! defined( 'TUTORLMS_ANALYTICS_DIR' ) ) {
+	define( 'TUTORLMS_ANALYTICS_DIR', plugin_dir_path( __FILE__ ) );
+}
+if ( ! defined( 'TUTORLMS_ANALYTICS_URL' ) ) {
+	define( 'TUTORLMS_ANALYTICS_URL', plugin_dir_url( __FILE__ ) );
+}
 
 /**
  * Autoloader for plugin classes.
