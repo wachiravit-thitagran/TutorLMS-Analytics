@@ -4,33 +4,76 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+      - 'tests/**'
+      - 'bin/**'
   workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 permissions:
   contents: write
 
 jobs:
   build:
+    if: ${{ !contains(github.event.head_commit.message, '[skip release]') }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute next version
+        id: ver
+        run: |
+          set -euo pipefail
+          current=$(grep -iE '^\s*\*?\s*Version:' tutorlms-analytics.php | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
+          latest_tag=$(git tag --list 'v*' --sort=-v:refname | grep -oE '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1 | sed 's/^v//' || true)
+          echo "header=${current:-none}  latest_tag=${latest_tag:-none}"
+
+          if [ -z "${latest_tag}" ]; then
+            next="${current:-0.1.0}"
+          else
+            higher=$(printf '%s\n%s\n' "$current" "$latest_tag" | sort -V | tail -1)
+            if [ -n "$current" ] && [ "$higher" = "$current" ] && [ "$current" != "$latest_tag" ]; then
+              next="$current"
+            else
+              IFS=. read -r MA MI PA <<< "$latest_tag"
+              next="${MA}.${MI}.$((PA + 1))"
+            fi
+          fi
+
+          if ! printf '%s' "$next" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Computed version '$next' is not valid semver; aborting." >&2
+            exit 1
+          fi
+
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+          echo "tag=v$next" >> "$GITHUB_OUTPUT"
+          echo "Next version: $next (tag v$next)"
+
+      - name: Stamp version into plugin
+        env:
+          NEXT: ${{ steps.ver.outputs.next }}
+        run: |
+          set -euo pipefail
+          sed -i -E "s/^([[:space:]]*\*[[:space:]]*Version:[[:space:]]*).*/\1${NEXT}/" tutorlms-analytics.php
+          sed -i -E "s/(TUTORLMS_ANALYTICS_VERSION', ')[0-9.]+(')/\1${NEXT}\2/" tutorlms-analytics.php
+          sed -i -E "s/(TUTORLMS_ANALYTICS_VERSION', ')[0-9.]+(')/\1${NEXT}\2/" tests/bootstrap.php
+          echo "Stamped ${NEXT}:"
+          grep -REn 'Version:|_VERSION' tutorlms-analytics.php tests/bootstrap.php | grep -F "${NEXT}"
 
       - name: Make build script executable
         run: chmod +x bin/build.sh
 
       - name: Build plugin zips
         run: bin/build.sh
-
-      - name: Determine release version
-        id: version
-        run: |
-          version="$(grep -iE '^\s*\*?\s*Version:' tutorlms-analytics.php \
-            | head -n1 \
-            | sed -E 's/.*[Vv]ersion:[[:space:]]*([0-9A-Za-z._-]+).*/\1/')"
-          echo "version=${version}" >> "$GITHUB_OUTPUT"
-          echo "Release version: v${version}"
 
       - name: List artifacts
         run: ls -lh dist/
@@ -45,7 +88,7 @@ jobs:
       - name: Publish to GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: v${{ steps.version.outputs.version }}
+          TAG: ${{ steps.ver.outputs.tag }}
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG exists — refreshing assets."
