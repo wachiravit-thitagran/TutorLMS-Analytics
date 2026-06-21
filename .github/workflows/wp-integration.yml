@@ -82,3 +82,18 @@ jobs:
         wp eval 'echo "Deactivation successful!";' --allow-root
         wp plugin activate tutorlms-analytics --allow-root
         wp eval 'echo "Reactivation successful!";' --allow-root
+
+    - name: Smoke Test - Render Dashboard
+      run: |
+        cd /tmp/wordpress
+        wp eval '
+        $menu = new \TutorLMS_Analytics\Admin_Menu();
+        ob_start();
+        $menu->render_page();
+        $output = ob_get_clean();
+        if (strpos($output, "Tutor Analytics") === false && strpos($output, "bg-gray-50") === false) {
+           echo "Failed to render dashboard correctly.\n";
+           exit(1);
+        }
+        echo "Dashboard rendering test passed!\n";
+        ' --allow-root
