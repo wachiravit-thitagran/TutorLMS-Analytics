@@ -74,10 +74,10 @@ class REST_API {
 	}
 
 	private function parse_browser( string $ua ): string {
+		if ( stripos( $ua, 'Edg' ) !== false || stripos( $ua, 'Edge' ) !== false ) return 'Edge';
 		if ( stripos( $ua, 'Chrome' ) !== false ) return 'Chrome';
 		if ( stripos( $ua, 'Safari' ) !== false ) return 'Safari';
 		if ( stripos( $ua, 'Firefox' ) !== false ) return 'Firefox';
-		if ( stripos( $ua, 'Edge' ) !== false ) return 'Edge';
 		return 'Other';
 	}
 }
