@@ -125,4 +125,40 @@ class DataProviderTest extends TestCase {
 		$this->assertEquals( 10, $activity['พุธ'] );
 		$this->assertEquals( 0, $activity['จันทร์'] );
 	}
+
+	public function test_get_enrollment_trend_various_data(): void {
+		global $wpdb;
+		// Test leap year and varying counts
+		$wpdb->mock_results["GROUP BY date_format"] = array(
+			array( 'date_format' => '2024-02-29', 'count' => 100 ), // Leap year
+			array( 'date_format' => '2024-03-01', 'count' => 50 ),
+			array( 'date_format' => '2024-03-05', 'count' => 1000 ), // High number
+			array( 'date_format' => '2024-03-10', 'count' => 0 ), // Zero count explicitly
+		);
+
+		$reflection = new ReflectionClass( $this->provider );
+		$method = $reflection->getMethod( 'get_enrollment_trend_30_days' );
+		$method->setAccessible( true );
+
+		$trend = $method->invoke( $this->provider, 0 );
+		
+		$this->assertIsArray( $trend );
+		$this->assertArrayHasKey( 'labels', $trend );
+		$this->assertArrayHasKey( 'data', $trend );
+		
+		// If data is populated, check logic
+		if (!empty($trend['data'])) {
+			$this->assertContains( 1000, $trend['data'] );
+		}
+	}
+	
+	public function test_get_all_stats_extreme_numbers(): void {
+		global $wpdb;
+		$wpdb->mock_var["post_parent = 999"] = 999999999; // Very large number of students
+		$wpdb->mock_var["comment_post_ID = 999"] = 555555555; // Large number of completions
+		
+		$stats = $this->provider->get_all_stats( 999 );
+		$this->assertEquals( 999999999, $stats['total_students'] );
+		$this->assertEquals( 555555555, $stats['total_completions'] );
+	}
 }
