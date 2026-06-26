@@ -31,9 +31,9 @@ class Course_Performance_Provider {
 
 			// 1. Total Learners
 			$learners = (int) $wpdb->get_var( $wpdb->prepare( "
-				SELECT COUNT(DISTINCT user_id) 
-				FROM {$wpdb->comments} 
-				WHERE comment_post_ID = %d AND comment_type = 'tutor_enrolled' AND comment_approved = 'approved'
+				SELECT COUNT(DISTINCT post_author) 
+				FROM {$wpdb->posts} 
+				WHERE post_parent = %d AND post_type = 'tutor_enrolled' AND post_status IN ('completed', 'processing', 'publish')
 			", $cid ) );
 
 			// 2. Completions

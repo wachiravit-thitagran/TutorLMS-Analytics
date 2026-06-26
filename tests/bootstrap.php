@@ -46,6 +46,7 @@ if ( ! function_exists( 'plugin_dir_url' ) ) {
 class Mock_WPDB {
 	public $posts = 'wp_posts';
 	public $comments = 'wp_comments';
+	public $prefix = 'wp_';
 	public $mock_results = array();
 	public $mock_var = array();
 	public $default_var = 0;
