@@ -106,7 +106,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<thead class="bg-gray-50">
 					<tr>
 						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">คอร์สเรียน</th>
-						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ (Health)</th>
+						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative group cursor-help">
+							สถานะ (Health) <i class="ti ti-info-circle ml-1"></i>
+							<div class="absolute bottom-full left-0 mb-2 hidden group-hover:block w-64 p-3 bg-gray-800 text-white text-xs rounded shadow-lg z-10 whitespace-normal normal-case font-normal leading-relaxed">
+								<strong>สูตรคำนวณ Health (เต็ม 100):</strong><br>
+								• <strong>อัตราเรียนจบ (50):</strong> <code>% เรียนจบ &times; 0.5</code><br>
+								• <strong>คะแนนรีวิว (40):</strong> <code>(ดาว / 5) &times; 40</code><br>
+								• <strong>ผู้ลงทะเบียน (10):</strong> <code>มีผู้เรียนอย่างน้อย 1 คน = 10</code><br>
+								<em>คะแนนรวม = นำทั้ง 3 ส่วนมาบวกกัน</em>
+							</div>
+						</th>
 						<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้เรียน</th>
 						<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">เรียนจบ</th>
 						<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการ</th>
