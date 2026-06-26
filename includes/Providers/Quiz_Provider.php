@@ -19,17 +19,17 @@ class Quiz_Provider {
 		}
 
 		$where = "q.total_marks > 0";
-		$join  = "";
+		$join  = "LEFT JOIN {$wpdb->postmeta} pm ON q.quiz_id = pm.post_id AND pm.meta_key = '_tutor_quiz_passing_grade'";
 		
 		if ( $course_id > 0 ) {
-			$join  = "INNER JOIN {$wpdb->posts} p ON q.quiz_id = p.ID";
+			$join  .= " INNER JOIN {$wpdb->posts} p ON q.quiz_id = p.ID";
 			$where .= $wpdb->prepare( " AND p.post_parent = %d", $course_id );
 		}
 
 		$stats = $wpdb->get_row( "
 			SELECT 
 				AVG(q.earned_marks / q.total_marks * 100) as avg_score,
-				SUM(CASE WHEN q.is_pass = 1 THEN 1 ELSE 0 END) as passed_count,
+				SUM(CASE WHEN (q.earned_marks / q.total_marks * 100) >= COALESCE(NULLIF(pm.meta_value, ''), 80) THEN 1 ELSE 0 END) as passed_count,
 				COUNT(*) as total_attempts
 			FROM {$table_name} q
 			{$join}
@@ -102,16 +102,16 @@ class Quiz_Provider {
 		if ( ! $table_exists ) return [];
 
 		$where = "q.total_marks > 0";
-		$join  = "";
+		$join  = "LEFT JOIN {$wpdb->postmeta} pm ON q.quiz_id = pm.post_id AND pm.meta_key = '_tutor_quiz_passing_grade'";
 		if ( $course_id > 0 ) {
-			$join  = "INNER JOIN {$wpdb->posts} p ON q.quiz_id = p.ID";
+			$join  .= " INNER JOIN {$wpdb->posts} p ON q.quiz_id = p.ID";
 			$where .= $wpdb->prepare( " AND p.post_parent = %d", $course_id );
 		}
 
 		$query = "
 			SELECT 
-				SUM(CASE WHEN q.is_pass = 1 THEN 1 ELSE 0 END) as passed,
-				SUM(CASE WHEN q.is_pass = 0 THEN 1 ELSE 0 END) as failed
+				SUM(CASE WHEN (q.earned_marks / q.total_marks * 100) >= COALESCE(NULLIF(pm.meta_value, ''), 80) THEN 1 ELSE 0 END) as passed,
+				SUM(CASE WHEN (q.earned_marks / q.total_marks * 100) < COALESCE(NULLIF(pm.meta_value, ''), 80) THEN 1 ELSE 0 END) as failed
 			FROM {$table_name} q
 			{$join}
 			WHERE {$where}
