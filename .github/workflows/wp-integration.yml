@@ -2,17 +2,18 @@ name: WP Integration
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   integration:
-    name: "WP Integration (PHP ${{ matrix.php-version }})"
+    name: "WP Integration (PHP ${{ matrix.php-version }}, WP ${{ matrix.wp-version }})"
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: ['7.4', '8.0', '8.1', '8.2', '8.3']
+        php-version: ["7.4", "8.0", "8.1", "8.2", "8.3"]
+        wp-version: ["latest", "6.5", "6.4"]
       fail-fast: false
 
     services:
@@ -30,70 +31,84 @@ jobs:
           --health-retries=3
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php-version }}
-        extensions: mysqli, curl, dom, xml, mbstring
-        tools: wp-cli, composer
-        coverage: none
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mysqli, curl, dom, xml, mbstring
+          tools: wp-cli, composer
+          coverage: none
 
-    - name: Get Composer Cache Directory
-      id: composer-cache
-      run: |
-        echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-    - name: Cache Composer Dependencies
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.composer-cache.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-composer-
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
-    - name: Install Plugin Dependencies
-      run: composer install --prefer-dist --no-interaction --no-progress --no-dev
+      - name: Install Plugin Dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress --no-dev
 
-    - name: Install WordPress Core
-      run: |
-        mkdir -p /tmp/wordpress
-        cd /tmp/wordpress
-        wp core download --allow-root
-        wp config create --dbname=wordpress --dbuser=root --dbpass=root --dbhost=127.0.0.1 --allow-root
-        wp core install --url=http://localhost --title="Test Site" --admin_user=admin --admin_password=admin --admin_email=admin@example.com --allow-root
+      - name: Install WordPress Core
+        run: |
+          mkdir -p /tmp/wordpress
+          cd /tmp/wordpress
+          if [ "${{ matrix.wp-version }}" = "latest" ]; then
+            wp core download --allow-root
+          else
+            wp core download --version=${{ matrix.wp-version }} --force --allow-root
+          fi
+          wp config create --dbname=wordpress --dbuser=root --dbpass=root --dbhost=127.0.0.1 --allow-root
+          wp core install --url=http://localhost --title="Test Site" --admin_user=admin --admin_password=admin --admin_email=admin@example.com --allow-root
 
-    - name: Symlink Plugin
-      run: |
-        # Link the current repository to the WordPress plugins directory
-        ln -s $GITHUB_WORKSPACE /tmp/wordpress/wp-content/plugins/tutorlms-analytics
+      - name: Symlink Plugin
+        run: |
+          # Link the current repository to the WordPress plugins directory
+          ln -s $GITHUB_WORKSPACE /tmp/wordpress/wp-content/plugins/tutorlms-analytics
 
-    - name: Activate Plugin
-      run: |
-        cd /tmp/wordpress
-        wp plugin activate tutorlms-analytics --allow-root
+      - name: Activate Plugin
+        run: |
+          cd /tmp/wordpress
+          wp plugin activate tutorlms-analytics --allow-root
 
-    - name: Lifecycle Test - Deactivate & Reactivate
-      run: |
-        cd /tmp/wordpress
-        wp plugin deactivate tutorlms-analytics --allow-root
-        wp eval 'echo "Deactivation successful!";' --allow-root
-        wp plugin activate tutorlms-analytics --allow-root
-        wp eval 'echo "Reactivation successful!";' --allow-root
+      - name: Lifecycle Test - Deactivate & Reactivate
+        run: |
+          cd /tmp/wordpress
+          wp plugin deactivate tutorlms-analytics --allow-root
+          wp eval 'echo "Deactivation successful!";' --allow-root
+          wp plugin activate tutorlms-analytics --allow-root
+          wp eval 'echo "Reactivation successful!";' --allow-root
 
-    - name: Smoke Test - Render Dashboard
-      run: |
-        cd /tmp/wordpress
-        wp eval '
-        $menu = new \TutorLMS_Analytics\Admin_Menu();
-        ob_start();
-        $menu->render_page();
-        $output = ob_get_clean();
-        if (strpos($output, "Tutor Analytics") === false && strpos($output, "bg-gray-50") === false) {
-           echo "Failed to render dashboard correctly.\n";
-           exit(1);
-        }
-        echo "Dashboard rendering test passed!\n";
-        ' --allow-root
+      - name: Smoke Test - Render Dashboard
+        run: |
+          cd /tmp/wordpress
+          wp eval '
+          $menu = new \TutorLMS_Analytics\Admin_Menu();
+          ob_start();
+          $menu->render_page();
+          $output = ob_get_clean();
+          if (strpos($output, "Tutor Analytics") === false && strpos($output, "bg-gray-50") === false) {
+             echo "Failed to render dashboard correctly.\n";
+             exit(1);
+          }
+          echo "Dashboard rendering test passed!\n";
+          ' --allow-root
+
+      - name: Seed and Verify Advanced Analytics Dashboard
+        run: |
+          cd /tmp/wordpress
+          wp eval-file "$GITHUB_WORKSPACE/tests/wp-integration-advanced-analytics.php" --allow-root
+
+      - name: Comprehensive Analytics Tests
+        run: |
+          cd /tmp/wordpress
+          wp eval-file "$GITHUB_WORKSPACE/tests/wp-integration-comprehensive.php" --allow-root

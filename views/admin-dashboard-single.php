@@ -26,7 +26,7 @@ $course_title = get_the_title( $course_id );
 			<span class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium tracking-wide">สถิติรายคอร์ส</span>
 		</h1>
 	</div>
-	
+
 	<!-- Tabs Navigation -->
 	<div class="border-b border-gray-200 mb-6 bg-white rounded-t-lg px-4 pt-4 shadow-sm">
 		<nav class="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
@@ -34,10 +34,14 @@ $course_title = get_the_title( $course_id );
 			<a href="#" @click.prevent="tab = 'teaching'" :class="tab === 'teaching' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">ประสิทธิผลการสอน</a>
 			<a href="#" @click.prevent="tab = 'content-gaps'" :class="tab === 'content-gaps' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">จุดปรับปรุง</a>
 			<a href="#" @click.prevent="tab = 'content-insights'" :class="tab === 'content-insights' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">สถิติรายบทเรียน</a>
+			<a href="#" @click.prevent="tab = 'cohorts'" :class="tab === 'cohorts' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">Cohort & Retention</a>
+			<a href="#" @click.prevent="tab = 'segments'" :class="tab === 'segments' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">กลุ่มผู้เรียน</a>
+			<a href="#" @click.prevent="tab = 'content-quality'" :class="tab === 'content-quality' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">คุณภาพเนื้อหา</a>
+			<a href="#" @click.prevent="tab = 'quiz-diagnostics'" :class="tab === 'quiz-diagnostics' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">วิเคราะห์ข้อสอบ</a>
 			<a href="#" @click.prevent="tab = 'learners'" :class="tab === 'learners' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">รายชื่อผู้เรียน</a>
 			<a href="#" @click.prevent="tab = 'alerts'" :class="tab === 'alerts' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
 				ศูนย์จัดการ (Action Center)
-				<?php 
+				<?php
 					$alert_count = count( $stats['alerts'] ?? [] );
 					$at_risk_count = $stats['engagement']['at_risk_count'] ?? 0;
 					$total_badge = $alert_count + $at_risk_count;
@@ -67,7 +71,7 @@ $course_title = get_the_title( $course_id );
 			</div>
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 border-l-4 border-l-red-500">
 				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">อัตราการทิ้งคอร์ส</h3>
-				<?php 
+				<?php
 					$survival_data = $stats['survival_curve']['data'] ?? [];
 					$drop_off = 0;
 					if ( ! empty( $survival_data ) ) {
@@ -104,7 +108,7 @@ $course_title = get_the_title( $course_id );
 					<canvas id="survivalChart"></canvas>
 				</div>
 			</div>
-			
+
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
 				<h3 class="text-lg font-semibold text-gray-800 mb-1">สัดส่วนความคืบหน้า</h3>
 				<p class="text-sm text-gray-500 mb-4">การกระจายตัวของสถานะการเรียนปัจจุบัน</p>
@@ -123,7 +127,7 @@ $course_title = get_the_title( $course_id );
 					<canvas id="quizScoreDistributionChart"></canvas>
 				</div>
 			</div>
-			
+
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
 				<h3 class="text-lg font-semibold text-gray-800 mb-1">สัดส่วนการสอบผ่าน/ตก</h3>
 				<p class="text-sm text-gray-500 mb-4">แสดงอัตราการสอบผ่านเมื่อเทียบกับการเข้าสอบทั้งหมด</p>
@@ -210,7 +214,7 @@ $course_title = get_the_title( $course_id );
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
 				<h3 class="text-lg font-semibold text-gray-800 mb-2">Net Promoter Score (NPS)</h3>
 				<p class="text-sm text-gray-500 mb-4">4-5★ = Promoter, 3★ = Passive, 1-2★ = Detractor</p>
-				<?php 
+				<?php
 					$nps = $stats['rating_analytics']['nps_score'] ?? array('score' => 0, 'promoters' => 0, 'passives' => 0, 'detractors' => 0, 'total' => 0);
 					$nps_color = $nps['score'] >= 50 ? 'text-green-600' : ($nps['score'] >= 0 ? 'text-yellow-600' : 'text-red-600');
 				?>
@@ -374,6 +378,154 @@ $course_title = get_the_title( $course_id );
 		<?php endif; ?>
 	</div>
 
+	<!-- TAB: Cohorts & Retention -->
+	<div x-show="tab === 'cohorts'" x-cloak>
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+				<div class="px-6 py-4 border-b border-gray-100">
+					<h3 class="text-lg font-semibold text-gray-800">Completion Rate by Enrollment Cohort</h3>
+					<p class="text-sm text-gray-500">เปรียบเทียบผู้เรียนที่สมัครในแต่ละเดือนว่าเรียนจบกี่เปอร์เซ็นต์</p>
+				</div>
+				<?php $cohorts = $stats['cohort_analytics']['completion_by_enrollment_cohort'] ?? []; ?>
+				<?php if ( empty( $cohorts ) ) : ?>
+					<div class="p-6 text-center text-gray-500">ไม่มีข้อมูล cohort เพียงพอ</div>
+				<?php else : ?>
+					<table class="min-w-full divide-y divide-gray-200">
+						<thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cohort</th><th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">สมัคร</th><th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">เรียนจบ</th><th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Completion</th></tr></thead>
+						<tbody class="divide-y divide-gray-100">
+							<?php foreach ( $cohorts as $cohort ) : ?>
+							<tr><td class="px-6 py-3 text-sm font-medium text-gray-800"><?php echo esc_html( $cohort['cohort'] ); ?></td><td class="px-6 py-3 text-sm text-right"><?php echo esc_html( number_format( $cohort['enrolled'] ) ); ?></td><td class="px-6 py-3 text-sm text-right"><?php echo esc_html( number_format( $cohort['completed'] ) ); ?></td><td class="px-6 py-3 text-sm text-right font-semibold text-blue-600"><?php echo esc_html( $cohort['completion_rate'] ); ?>%</td></tr>
+							<?php endforeach; ?>
+						</tbody>
+					</table>
+				<?php endif; ?>
+			</div>
+
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+				<div class="px-6 py-4 border-b border-gray-100">
+					<h3 class="text-lg font-semibold text-gray-800">Retention by Week</h3>
+					<p class="text-sm text-gray-500">สัปดาห์ที่ 1/2/3 ยังมีผู้เรียน active อยู่กี่เปอร์เซ็นต์</p>
+				</div>
+				<?php $retention = $stats['cohort_analytics']['retention_by_week'] ?? []; ?>
+				<?php if ( empty( $retention ) ) : ?>
+					<div class="p-6 text-center text-gray-500">ไม่มีข้อมูล retention เพียงพอ</div>
+				<?php else : ?>
+					<div class="p-6 space-y-3">
+						<?php foreach ( $retention as $week ) : ?>
+							<div>
+								<div class="flex justify-between text-sm mb-1"><span class="font-medium text-gray-700"><?php echo esc_html( $week['week'] ); ?></span><span><?php echo esc_html( $week['retention_rate'] ); ?>% (<?php echo esc_html( number_format( $week['active_learners'] ) ); ?> คน)</span></div>
+								<div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width: <?php echo esc_attr( min( 100, (float) $week['retention_rate'] ) ); ?>%"></div></div>
+							</div>
+						<?php endforeach; ?>
+					</div>
+				<?php endif; ?>
+			</div>
+		</div>
+	</div>
+
+	<!-- TAB: Learner Segments -->
+	<div x-show="tab === 'segments'" x-cloak>
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+			<?php
+			$segment_blocks = array(
+				array( 'title' => 'Engagement Trend ต่อผู้เรียน', 'items' => $stats['engagement']['engagement_trends'] ?? [], 'empty' => 'ไม่มีข้อมูล trend', 'type' => 'trend' ),
+				array( 'title' => 'High Intent but Stuck', 'items' => $stats['engagement']['high_intent_stuck'] ?? [], 'empty' => 'ไม่พบผู้เรียนที่เข้าเรียนบ่อยแต่คืบหน้าต่ำ', 'type' => 'stuck' ),
+				array( 'title' => 'Fast Learners / Power Learners', 'items' => $stats['engagement']['power_learners'] ?? [], 'empty' => 'ยังไม่มี power learners', 'type' => 'power' ),
+				array( 'title' => 'Low Engagement but High Score', 'items' => $stats['engagement']['low_engagement_high_score'] ?? [], 'empty' => 'ไม่พบกลุ่มเรียนไม่บ่อยแต่คะแนนสูง', 'type' => 'low_high' ),
+			);
+			?>
+			<?php foreach ( $segment_blocks as $block ) : ?>
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+				<div class="px-6 py-4 border-b border-gray-100"><h3 class="text-lg font-semibold text-gray-800"><?php echo esc_html( $block['title'] ); ?></h3></div>
+				<?php if ( empty( $block['items'] ) ) : ?>
+					<div class="p-6 text-center text-gray-500"><?php echo esc_html( $block['empty'] ); ?></div>
+				<?php else : ?>
+					<ul class="divide-y divide-gray-100 m-0 p-0 list-none">
+						<?php foreach ( array_slice( $block['items'], 0, 8 ) as $item ) : ?>
+						<li class="px-6 py-3 flex items-center justify-between text-sm"><span class="font-medium text-gray-800"><?php echo esc_html( $item['display_name'] ?? ( 'User ' . ( $item['user_id'] ?? '' ) ) ); ?></span><span class="text-gray-500">
+							<?php if ( 'trend' === $block['type'] ) : ?><?php echo esc_html( $item['trend'] ); ?> <?php echo esc_html( $item['change_pct'] ); ?>%
+							<?php elseif ( 'stuck' === $block['type'] ) : ?>Progress <?php echo esc_html( $item['progress_pct'] ); ?>% / <?php echo esc_html( $item['events_14d'] ); ?> events
+							<?php elseif ( 'power' === $block['type'] ) : ?><?php echo esc_html( $item['quiz_avg_score'] ); ?>% / <?php echo esc_html( $item['days_to_complete'] ); ?> วัน
+							<?php else : ?>Engagement <?php echo esc_html( $item['score'] ); ?> / Quiz <?php echo esc_html( $item['quiz_avg_score'] ); ?>%
+							<?php endif; ?>
+						</span></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
+			</div>
+			<?php endforeach; ?>
+		</div>
+	</div>
+
+	<!-- TAB: Content Quality -->
+	<div x-show="tab === 'content-quality'" x-cloak>
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+			<?php
+			$content_quality_blocks = array(
+				array( 'title' => 'Lesson Rewatch / Revisit Rate', 'items' => $stats['time_analytics']['lesson_revisit_rate'] ?? [], 'empty' => 'ไม่มีข้อมูลการเปิดบทเรียนซ้ำ', 'type' => 'revisit' ),
+				array( 'title' => 'Time-to-Complete per Lesson', 'items' => $stats['time_analytics']['time_to_complete_per_lesson'] ?? [], 'empty' => 'ไม่มีข้อมูลเวลาเรียนต่อบท', 'type' => 'time' ),
+				array( 'title' => 'Exit Lesson', 'items' => $stats['content_gaps']['exit_lessons'] ?? [], 'empty' => 'ไม่มีข้อมูลบทเรียนสุดท้ายก่อนผู้เรียนหายไป', 'type' => 'exit' ),
+				array( 'title' => 'Content Difficulty Index', 'items' => $stats['content_gaps']['difficulty_index'] ?? [], 'empty' => 'ไม่มีข้อมูล difficulty index', 'type' => 'difficulty' ),
+				array( 'title' => 'Content Engagement Index', 'items' => $stats['content_gaps']['engagement_index'] ?? [], 'empty' => 'ไม่มีข้อมูล engagement index', 'type' => 'engagement' ),
+			);
+			?>
+			<?php foreach ( $content_quality_blocks as $block ) : ?>
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+				<div class="px-6 py-4 border-b border-gray-100"><h3 class="text-lg font-semibold text-gray-800"><?php echo esc_html( $block['title'] ); ?></h3></div>
+				<?php if ( empty( $block['items'] ) ) : ?>
+					<div class="p-6 text-center text-gray-500"><?php echo esc_html( $block['empty'] ); ?></div>
+				<?php else : ?>
+					<ul class="divide-y divide-gray-100 m-0 p-0 list-none">
+						<?php foreach ( array_slice( $block['items'], 0, 8 ) as $item ) : ?>
+						<li class="px-6 py-3 flex items-center justify-between text-sm"><span class="font-medium text-gray-800"><?php echo esc_html( $item['title'] ); ?></span><span class="text-gray-500">
+							<?php if ( 'revisit' === $block['type'] ) : ?>Revisit <?php echo esc_html( $item['revisit_rate'] ); ?>%
+							<?php elseif ( 'time' === $block['type'] ) : ?><?php echo esc_html( $item['avg_minutes'] ); ?> นาที
+							<?php elseif ( 'exit' === $block['type'] ) : ?>Exit <?php echo esc_html( $item['exit_rate'] ); ?>%
+							<?php else : ?>Score <?php echo esc_html( $item['score'] ); ?>/100
+							<?php endif; ?>
+						</span></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
+			</div>
+			<?php endforeach; ?>
+		</div>
+	</div>
+
+	<!-- TAB: Quiz Diagnostics -->
+	<div x-show="tab === 'quiz-diagnostics'" x-cloak>
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+			<?php
+			$quiz_blocks = array(
+				array( 'title' => 'Question Difficulty', 'items' => $stats['quiz_diagnostics']['question_difficulty'] ?? [], 'empty' => 'ไม่มีข้อมูลความยากรายข้อ', 'type' => 'difficulty' ),
+				array( 'title' => 'Most Common Wrong Answers', 'items' => $stats['quiz_diagnostics']['common_wrong_answers'] ?? [], 'empty' => 'ไม่มีข้อมูลคำตอบผิดยอดนิยม', 'type' => 'wrong' ),
+				array( 'title' => 'Attempts Before Pass', 'items' => $stats['quiz_diagnostics']['attempts_before_pass'] ?? [], 'empty' => 'ไม่มีข้อมูลจำนวนครั้งก่อนสอบผ่าน', 'type' => 'attempts' ),
+				array( 'title' => 'Quiz Retry Behavior', 'items' => $stats['quiz_diagnostics']['retry_behavior'] ?? [], 'empty' => 'ไม่มีข้อมูล retry หลังสอบตก', 'type' => 'retry' ),
+			);
+			?>
+			<?php foreach ( $quiz_blocks as $block ) : ?>
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+				<div class="px-6 py-4 border-b border-gray-100"><h3 class="text-lg font-semibold text-gray-800"><?php echo esc_html( $block['title'] ); ?></h3></div>
+				<?php if ( empty( $block['items'] ) ) : ?>
+					<div class="p-6 text-center text-gray-500"><?php echo esc_html( $block['empty'] ); ?></div>
+				<?php else : ?>
+					<ul class="divide-y divide-gray-100 m-0 p-0 list-none">
+						<?php foreach ( array_slice( $block['items'], 0, 8 ) as $item ) : ?>
+						<li class="px-6 py-3 flex items-center justify-between text-sm"><span class="font-medium text-gray-800"><?php echo esc_html( $item['title'] ?? $item['answer'] ?? ( 'Question ' . ( $item['question_id'] ?? '' ) ) ); ?></span><span class="text-gray-500">
+							<?php if ( 'difficulty' === $block['type'] ) : ?>Correct <?php echo esc_html( $item['correct_rate'] ); ?>%
+							<?php elseif ( 'wrong' === $block['type'] ) : ?>เลือกผิด <?php echo esc_html( $item['selected_count'] ); ?> ครั้ง
+							<?php elseif ( 'attempts' === $block['type'] ) : ?>เฉลี่ย <?php echo esc_html( $item['avg_attempts_before_pass'] ); ?> ครั้ง
+							<?php else : ?>Retry <?php echo esc_html( $item['retry_rate'] ); ?>%
+							<?php endif; ?>
+						</span></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
+			</div>
+			<?php endforeach; ?>
+		</div>
+	</div>
+
 	<!-- TAB 1.5: Content Insights -->
 	<div x-show="tab === 'content-insights'" x-cloak class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
 		<div class="px-6 py-4 border-b border-gray-100">
@@ -394,7 +546,7 @@ $course_title = get_the_title( $course_id );
 								<h4 class="font-semibold text-gray-800 m-0"><?php echo esc_html( $topic['title'] ); ?></h4>
 								<span class="text-xs text-gray-500"><?php echo count( $topic['contents'] ); ?> รายการ</span>
 							</div>
-							
+
 							<!-- Lessons & Quizzes -->
 							<ul class="divide-y divide-gray-100 m-0 p-0 list-none">
 								<?php if ( empty( $topic['contents'] ) ) : ?>
@@ -414,7 +566,7 @@ $course_title = get_the_title( $course_id );
 												<?php endif; ?>
 												<span class="text-sm font-medium text-gray-700"><?php echo esc_html( $content['title'] ); ?></span>
 											</div>
-											
+
 											<div class="flex items-center gap-4 text-sm text-gray-600 shrink-0">
 												<?php if ( $content['type'] === 'lesson' ) : ?>
 													<div class="flex items-center gap-1 bg-green-50 text-green-700 px-2 py-1 rounded">
@@ -523,7 +675,7 @@ $course_title = get_the_title( $course_id );
 										<div class="bg-blue-600 h-2.5 rounded-full" style="width: <?php echo esc_attr( $s['avg_progress'] ); ?>%"></div>
 									</div>
 								</div>
-								
+
 								<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
 									<h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
 										<i class="ti ti-brain text-purple-500"></i> ประสิทธิภาพแบบทดสอบ
@@ -726,9 +878,9 @@ document.addEventListener('DOMContentLoaded', function() {
 					borderRadius: 4,
 				}]
 			},
-			options: { 
-				indexAxis: 'y', 
-				responsive: true, 
+			options: {
+				indexAxis: 'y',
+				responsive: true,
 				maintainAspectRatio: false,
 				plugins: { legend: { display: false } }
 			}

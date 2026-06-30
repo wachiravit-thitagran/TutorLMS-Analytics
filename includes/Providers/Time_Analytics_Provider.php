@@ -10,10 +10,12 @@ class Time_Analytics_Provider {
 	 */
 	public function get_time_analytics( int $course_id = 0 ): array {
 		return array(
-			'avg_time_per_lesson' => $this->get_avg_time_per_lesson( $course_id ),
-			'total_learning_time' => $this->get_total_learning_time( $course_id ),
-			'time_per_content'    => $this->get_time_per_content( $course_id ),
-			'avg_days_to_complete' => $this->get_avg_days_to_complete( $course_id ),
+			'avg_time_per_lesson'         => $this->get_avg_time_per_lesson( $course_id ),
+			'total_learning_time'         => $this->get_total_learning_time( $course_id ),
+			'time_per_content'            => $this->get_time_per_content( $course_id ),
+			'avg_days_to_complete'        => $this->get_avg_days_to_complete( $course_id ),
+			'lesson_revisit_rate'         => $this->get_lesson_revisit_rate( $course_id ),
+			'time_to_complete_per_lesson' => $this->get_time_to_complete_per_lesson( $course_id ),
 		);
 	}
 
@@ -76,7 +78,7 @@ class Time_Analytics_Provider {
 		if ( ! $table_exists ) return [];
 
 		$query = $wpdb->prepare( "
-			SELECT 
+			SELECT
 				e.lesson_id,
 				AVG(CAST(e.event_value AS UNSIGNED)) as avg_seconds,
 				COUNT(*) as sample_count
@@ -108,6 +110,86 @@ class Time_Analytics_Provider {
 		return $data;
 	}
 
+	public function get_lesson_revisit_rate( int $course_id = 0, int $limit = 10 ): array {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'tutorlms_analytics_events';
+		$table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") === $table_name;
+		if ( ! $table_exists ) return [];
+
+		$where = "event_type IN ('lesson_view', 'page_view') AND lesson_id > 0 AND user_id > 0";
+		if ( $course_id > 0 ) {
+			$where .= $wpdb->prepare( ' AND course_id = %d', $course_id );
+		}
+
+		$rows = $wpdb->get_results( "
+			SELECT lesson_id, COUNT(*) as total_views, COUNT(DISTINCT user_id) as unique_learners
+			FROM {$table_name}
+			WHERE {$where}
+			GROUP BY lesson_id
+			HAVING total_views > unique_learners
+			ORDER BY (total_views - unique_learners) DESC
+			LIMIT {$limit}
+		", ARRAY_A );
+
+		$data = [];
+		foreach ( (array) $rows as $row ) {
+			$unique = (int) $row['unique_learners'];
+			$total = (int) $row['total_views'];
+			$title = get_the_title( (int) $row['lesson_id'] );
+			if ( ! $title ) {
+				continue;
+			}
+			$data[] = array(
+				'lesson_id'       => (int) $row['lesson_id'],
+				'title'           => $title,
+				'unique_learners' => $unique,
+				'total_views'     => $total,
+				'revisit_rate'    => $unique > 0 ? round( ( ( $total - $unique ) / $unique ) * 100, 1 ) : 0.0,
+			);
+		}
+
+		return $data;
+	}
+
+	public function get_time_to_complete_per_lesson( int $course_id = 0, int $limit = 20 ): array {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'tutorlms_analytics_events';
+		$table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") === $table_name;
+		if ( ! $table_exists ) return [];
+
+		$where = "event_type = 'page_exit' AND lesson_id > 0 AND CAST(event_value AS UNSIGNED) > 0 AND CAST(event_value AS UNSIGNED) < 7200";
+		if ( $course_id > 0 ) {
+			$where .= $wpdb->prepare( ' AND course_id = %d', $course_id );
+		}
+
+		$rows = $wpdb->get_results( "
+			SELECT lesson_id, AVG(CAST(event_value AS UNSIGNED)) / 60 as avg_minutes, COUNT(*) as sample_count
+			FROM {$table_name}
+			WHERE {$where}
+			GROUP BY lesson_id
+			ORDER BY avg_minutes DESC
+			LIMIT {$limit}
+		", ARRAY_A );
+
+		$data = [];
+		foreach ( (array) $rows as $row ) {
+			$title = get_the_title( (int) $row['lesson_id'] );
+			if ( ! $title ) {
+				continue;
+			}
+			$data[] = array(
+				'lesson_id'    => (int) $row['lesson_id'],
+				'title'        => $title,
+				'avg_minutes'  => round( (float) $row['avg_minutes'], 1 ),
+				'sample_count' => (int) $row['sample_count'],
+			);
+		}
+
+		return $data;
+	}
+
 	/**
 	 * Average number of days from enrollment to course completion.
 	 */
@@ -125,8 +207,8 @@ class Time_Analytics_Provider {
 		$query = "
 			SELECT AVG(DATEDIFF(c.comment_date, e.post_date)) as avg_days
 			FROM {$wpdb->comments} c
-			INNER JOIN {$wpdb->posts} e 
-				ON e.post_author = c.user_id 
+			INNER JOIN {$wpdb->posts} e
+				ON e.post_author = c.user_id
 				AND e.post_parent = c.comment_post_ID
 			WHERE {$where_enroll}
 			  AND {$where_complete}

@@ -1,18 +1,18 @@
 {
-    "name": "wachiravit-thitagran/tutorlms-analytics",
-    "description": "Business Intelligence and Advanced Analytics for Tutor LMS.",
-    "type": "wordpress-plugin",
-    "license": "GPL-2.0-or-later",
-    "require": {
-        "php": ">=7.4"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^9.6",
-        "mockery/mockery": "^1.5",
-        "php-stubs/wordpress-stubs": "^6.4"
-    },
-    "scripts": {
-        "test": "phpunit",
-        "syntax": "find includes views tests *.php -name '*.php' -print0 | xargs -0 -n1 -P4 php -l"
-    }
+  "name": "wachiravit-thitagran/tutorlms-analytics",
+  "description": "Business Intelligence and Advanced Analytics for Tutor LMS.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.6",
+    "mockery/mockery": "^1.5",
+    "php-stubs/wordpress-stubs": "^6.4"
+  },
+  "scripts": {
+    "test": "phpunit",
+    "syntax": "find bin includes views tests *.php -name '*.php' -print0 | xargs -0 -n1 -P4 php -l"
+  }
 }

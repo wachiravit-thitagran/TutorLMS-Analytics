@@ -46,6 +46,7 @@ if ( ! function_exists( 'plugin_dir_url' ) ) {
 class Mock_WPDB {
 	public $posts = 'wp_posts';
 	public $comments = 'wp_comments';
+	public $postmeta = 'wp_postmeta';
 	public $prefix = 'wp_';
 	public $mock_results = array();
 	public $mock_var = array();
@@ -92,6 +93,51 @@ if ( ! function_exists( 'get_the_title' ) ) {
 	}
 }
 
+if ( ! function_exists( 'get_userdata' ) ) {
+	function get_userdata( $user_id ) {
+		return $GLOBALS['mock_users'][ $user_id ] ?? false;
+	}
+}
+
+if ( ! function_exists( 'get_user_meta' ) ) {
+	function get_user_meta( $user_id, $key = '', $single = false ) {
+		if ( isset( $GLOBALS['mock_user_meta'][ $user_id ][ $key ] ) ) {
+			return $GLOBALS['mock_user_meta'][ $user_id ][ $key ];
+		}
+		return $single ? '' : array();
+	}
+}
+
+if ( ! function_exists( 'esc_html' ) ) {
+	function esc_html( $text ) {
+		return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+	}
+}
+
+if ( ! function_exists( 'esc_attr' ) ) {
+	function esc_attr( $text ) {
+		return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+	}
+}
+
+if ( ! function_exists( 'esc_url' ) ) {
+	function esc_url( $url ) {
+		return (string) $url;
+	}
+}
+
+if ( ! function_exists( 'admin_url' ) ) {
+	function admin_url( $path = '' ) {
+		return 'http://example.org/wp-admin/' . ltrim( (string) $path, '/' );
+	}
+}
+
+if ( ! function_exists( 'wp_json_encode' ) ) {
+	function wp_json_encode( $data, $options = 0, $depth = 512 ) {
+		return json_encode( $data, $options, $depth );
+	}
+}
+
 if ( ! defined( 'ARRAY_A' ) ) {
 	define( 'ARRAY_A', 'ARRAY_A' );
 }
@@ -111,12 +157,12 @@ if ( ! function_exists( 'register_rest_route' ) ) {
 class WP_REST_Response {
 	public $data;
 	public $status;
-	
+
 	public function __construct( $data = null, $status = 200, $headers = array() ) {
 		$this->data = $data;
 		$this->status = $status;
 	}
-	
+
 	public function get_data() {
 		return $this->data;
 	}

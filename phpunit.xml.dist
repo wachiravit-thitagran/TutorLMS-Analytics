@@ -11,6 +11,7 @@
         <testsuite name="TutorLMS Analytics Test Suite">
             <directory suffix=".php">./tests</directory>
             <exclude>./tests/bootstrap.php</exclude>
+            <exclude>./tests/wp-integration-advanced-analytics.php</exclude>
         </testsuite>
     </testsuites>
 </phpunit>

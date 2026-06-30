@@ -38,7 +38,7 @@ class Admin_Menu {
 		$course_perf_prov  = new Providers\Course_Performance_Provider();
 		$student_provider  = new Providers\Student_Provider();
 		$alerts_provider   = new Providers\Alerts_Provider();
-		
+
 		// Legacy providers for specific tabs
 		$funnel_provider   = new Providers\Funnel_Provider();
 		$survival_provider = new Providers\Survival_Provider();
@@ -50,10 +50,11 @@ class Admin_Menu {
 		$content_gap_prov    = new Providers\Content_Gap_Provider();
 		$rating_prov         = new Providers\Rating_Analytics_Provider();
 		$engagement_prov     = new Providers\Engagement_Provider();
+		$cohort_provider     = new Providers\Cohort_Provider();
 
 		$courses = $provider->get_all_courses();
 		$stats   = $provider->get_all_stats( $course_id );
-		
+
 		// New BI Data
 		$stats['revenue']            = $revenue_provider->get_revenue_stats( $course_id );
 		$stats['course_performance'] = $course_perf_prov->get_course_table( $course_id );
@@ -69,12 +70,14 @@ class Admin_Menu {
 		$stats['device_analytics']   = $device_provider->get_device_analytics( $course_id );
 		$stats['rating_analytics']   = $rating_prov->get_rating_analytics( $course_id );
 		$stats['engagement']         = $engagement_prov->get_engagement_data( $course_id );
-		
+		$stats['cohort_analytics']   = $cohort_provider->get_cohort_analytics( $course_id );
+
 		if ( $course_id > 0 ) {
 			$stats['survival_curve']          = $survival_provider->get_survival_curve( $course_id );
 			$stats['quiz_score_distribution'] = $quiz_provider->get_quiz_score_distribution( $course_id );
 			$stats['pass_fail_ratio']         = $quiz_provider->get_pass_fail_ratio( $course_id );
 			$stats['content_gaps']            = $content_gap_prov->get_content_gaps( $course_id );
+			$stats['quiz_diagnostics']        = $quiz_provider->get_quiz_diagnostics( $course_id );
 			require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard-single.php';
 		} else {
 			require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard-global.php';
