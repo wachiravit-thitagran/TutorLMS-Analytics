@@ -94,6 +94,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</div>
 			</div>
 		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+				<h3 class="text-lg font-semibold text-gray-800 mb-4">สัดส่วนอุปกรณ์ที่ใช้เรียน</h3>
+				<div class="relative h-64 w-full">
+					<canvas id="globalDeviceChart"></canvas>
+				</div>
+			</div>
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+				<h3 class="text-lg font-semibold text-gray-800 mb-4">สัดส่วน Browser</h3>
+				<div class="relative h-64 w-full">
+					<canvas id="globalBrowserChart"></canvas>
+				</div>
+			</div>
+			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+				<h3 class="text-lg font-semibold text-gray-800 mb-4">ช่วงเวลาที่ผู้เรียนเข้าเรียน</h3>
+				<div class="relative h-64 w-full">
+					<canvas id="globalHourlyChart"></canvas>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<!-- TAB 2: Courses -->
@@ -288,6 +309,53 @@ document.addEventListener('DOMContentLoaded', function() {
 				}]
 			},
 			options: { responsive: true, maintainAspectRatio: false }
+		});
+	}
+
+	// Global Device Distribution
+	const gDeviceData = <?php echo wp_json_encode( $stats['device_analytics']['device_distribution'] ?? [] ); ?>;
+	if(document.getElementById('globalDeviceChart') && Object.keys(gDeviceData).length > 0) {
+		new Chart(document.getElementById('globalDeviceChart').getContext('2d'), {
+			type: 'doughnut',
+			data: {
+				labels: Object.keys(gDeviceData),
+				datasets: [{ data: Object.values(gDeviceData), backgroundColor: ['#3b82f6', '#f59e0b', '#10b981'] }]
+			},
+			options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+		});
+	}
+
+	// Global Browser Distribution
+	const gBrowserData = <?php echo wp_json_encode( $stats['device_analytics']['browser_distribution'] ?? [] ); ?>;
+	if(document.getElementById('globalBrowserChart') && Object.keys(gBrowserData).length > 0) {
+		new Chart(document.getElementById('globalBrowserChart').getContext('2d'), {
+			type: 'doughnut',
+			data: {
+				labels: Object.keys(gBrowserData),
+				datasets: [{ data: Object.values(gBrowserData), backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#6b7280'] }]
+			},
+			options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+		});
+	}
+
+	// Global Hourly Activity
+	const gHourlyData = <?php echo wp_json_encode( $stats['device_analytics']['hourly_activity'] ?? [] ); ?>;
+	if(document.getElementById('globalHourlyChart') && Object.keys(gHourlyData).length > 0) {
+		const gHrs = Object.keys(gHourlyData);
+		const gCts = Object.values(gHourlyData);
+		const gMax = Math.max(...gCts);
+		new Chart(document.getElementById('globalHourlyChart').getContext('2d'), {
+			type: 'bar',
+			data: {
+				labels: gHrs,
+				datasets: [{
+					label: 'กิจกรรม',
+					data: gCts,
+					backgroundColor: gCts.map(c => { const i = gMax > 0 ? c / gMax : 0; return `rgba(139, 92, 246, ${0.2 + i * 0.8})`; }),
+					borderRadius: 2,
+				}]
+			},
+			options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
 		});
 	}
 });

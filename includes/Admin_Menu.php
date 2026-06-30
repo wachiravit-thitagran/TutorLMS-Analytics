@@ -44,6 +44,13 @@ class Admin_Menu {
 		$survival_provider = new Providers\Survival_Provider();
 		$quiz_provider     = new Providers\Quiz_Provider();
 
+		// New analytics providers
+		$time_provider       = new Providers\Time_Analytics_Provider();
+		$device_provider     = new Providers\Device_Analytics_Provider();
+		$content_gap_prov    = new Providers\Content_Gap_Provider();
+		$rating_prov         = new Providers\Rating_Analytics_Provider();
+		$engagement_prov     = new Providers\Engagement_Provider();
+
 		$courses = $provider->get_all_courses();
 		$stats   = $provider->get_all_stats( $course_id );
 		
@@ -56,11 +63,18 @@ class Admin_Menu {
 		// Retained Advanced Data
 		$stats['progress_distribution'] = $funnel_provider->get_progress_distribution( $course_id );
 		$stats['quiz_performance']      = $quiz_provider->get_quiz_performance( $course_id );
+
+		// New Analytics Data
+		$stats['time_analytics']     = $time_provider->get_time_analytics( $course_id );
+		$stats['device_analytics']   = $device_provider->get_device_analytics( $course_id );
+		$stats['rating_analytics']   = $rating_prov->get_rating_analytics( $course_id );
+		$stats['engagement']         = $engagement_prov->get_engagement_data( $course_id );
 		
 		if ( $course_id > 0 ) {
 			$stats['survival_curve']          = $survival_provider->get_survival_curve( $course_id );
 			$stats['quiz_score_distribution'] = $quiz_provider->get_quiz_score_distribution( $course_id );
 			$stats['pass_fail_ratio']         = $quiz_provider->get_pass_fail_ratio( $course_id );
+			$stats['content_gaps']            = $content_gap_prov->get_content_gaps( $course_id );
 			require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard-single.php';
 		} else {
 			require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard-global.php';
