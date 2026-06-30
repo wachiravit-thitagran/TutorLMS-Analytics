@@ -26,6 +26,7 @@ class Data_Provider {
 			'active_students_trend' => $this->get_daily_active_students_30_days( $course_id ),
 			'course_popularity'     => $course_id === 0 ? $this->get_course_popularity() : [],
 			'activity_by_day'       => $this->get_activity_by_day_of_week( $course_id ),
+			'content_insights'      => $course_id > 0 ? $this->get_course_content_insights( $course_id ) : [],
 		);
 	}
 
@@ -229,5 +230,96 @@ class Data_Provider {
 		}
 		
 		return $data;
+	}
+
+	private function get_course_content_insights( int $course_id ): array {
+		global $wpdb;
+		if ( $course_id <= 0 ) return [];
+
+		// 1. Get all topics for this course ordered by menu_order
+		$topics = $wpdb->get_results( $wpdb->prepare( "
+			SELECT ID, post_title 
+			FROM {$wpdb->posts} 
+			WHERE post_type = 'topics' AND post_parent = %d AND post_status = 'publish'
+			ORDER BY menu_order ASC, ID ASC
+		", $course_id ), ARRAY_A );
+
+		if ( empty( $topics ) ) return [];
+
+		$insights = [];
+
+		$quiz_attempts_table = $wpdb->prefix . 'tutor_quiz_attempts';
+		$has_quiz_table = $wpdb->get_var("SHOW TABLES LIKE '{$quiz_attempts_table}'") === $quiz_attempts_table;
+
+		foreach ( (array) $topics as $topic ) {
+			$topic_id = (int) $topic['ID'];
+			
+			// 2. Get children (lesson, tutor_quiz) of this topic
+			$contents = $wpdb->get_results( $wpdb->prepare( "
+				SELECT ID, post_title, post_type
+				FROM {$wpdb->posts}
+				WHERE post_type IN ('lesson', 'tutor_quiz') AND post_parent = %d AND post_status = 'publish'
+				ORDER BY menu_order ASC, ID ASC
+			", $topic_id ), ARRAY_A );
+
+			if ( empty( $contents ) ) continue;
+
+			$topic_data = [
+				'id'       => $topic_id,
+				'title'    => $topic['post_title'],
+				'contents' => [],
+			];
+
+			foreach ( (array) $contents as $content ) {
+				$content_id = (int) $content['ID'];
+				$item = [
+					'id'    => $content_id,
+					'title' => $content['post_title'],
+					'type'  => $content['post_type'],
+				];
+
+				if ( $content['post_type'] === 'lesson' ) {
+					// Count completed students
+					$completed_count = $wpdb->get_var( $wpdb->prepare( "
+						SELECT COUNT(DISTINCT user_id) 
+						FROM {$wpdb->comments} 
+						WHERE comment_type = 'lesson_completed' 
+						  AND comment_post_ID = %d 
+						  AND comment_approved = 'approved'
+					", $content_id ) );
+					$item['completed_count'] = (int) $completed_count;
+					
+				} elseif ( $content['post_type'] === 'tutor_quiz' ) {
+					if ( $has_quiz_table ) {
+						$quiz_stats = $wpdb->get_row( $wpdb->prepare( "
+							SELECT 
+								COUNT(attempt_id) as total_attempts,
+								COUNT(DISTINCT user_id) as unique_users,
+								AVG(earned_marks / total_marks * 100) as avg_score
+							FROM {$quiz_attempts_table}
+							WHERE quiz_id = %d AND total_marks > 0
+						", $content_id ) );
+
+						$item['total_attempts'] = (int) ($quiz_stats->total_attempts ?? 0);
+						$item['unique_users']   = (int) ($quiz_stats->unique_users ?? 0);
+						$item['avg_score']      = round( (float) ($quiz_stats->avg_score ?? 0), 2 );
+						$item['avg_attempts_per_user'] = $item['unique_users'] > 0 
+							? round( $item['total_attempts'] / $item['unique_users'], 1 ) 
+							: 0;
+					} else {
+						$item['total_attempts'] = 0;
+						$item['unique_users']   = 0;
+						$item['avg_score']      = 0;
+						$item['avg_attempts_per_user'] = 0;
+					}
+				}
+
+				$topic_data['contents'][] = $item;
+			}
+
+			$insights[] = $topic_data;
+		}
+
+		return $insights;
 	}
 }

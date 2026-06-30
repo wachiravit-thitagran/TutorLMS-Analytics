@@ -31,6 +31,7 @@ $course_title = get_the_title( $course_id );
 	<div class="border-b border-gray-200 mb-6 bg-white rounded-t-lg px-4 pt-4 shadow-sm">
 		<nav class="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
 			<a href="#" @click.prevent="tab = 'insights'" :class="tab === 'insights' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">ข้อมูลเชิงลึกการเรียนรู้</a>
+			<a href="#" @click.prevent="tab = 'content-insights'" :class="tab === 'content-insights' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">สถิติรายบทเรียน</a>
 			<a href="#" @click.prevent="tab = 'learners'" :class="tab === 'learners' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">รายชื่อผู้เรียน</a>
 			<a href="#" @click.prevent="tab = 'alerts'" :class="tab === 'alerts' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
 				ศูนย์จัดการ (Action Center)
@@ -133,6 +134,77 @@ $course_title = get_the_title( $course_id );
 					<canvas id="completionTrendChart"></canvas>
 				</div>
 			</div>
+		</div>
+	</div>
+
+	<!-- TAB 1.5: Content Insights -->
+	<div x-show="tab === 'content-insights'" x-cloak class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
+		<div class="px-6 py-4 border-b border-gray-100">
+			<h3 class="text-lg font-semibold text-gray-800">สถิติรายบทเรียนและแบบทดสอบ</h3>
+			<p class="text-sm text-gray-500">เรียงตามโครงสร้างหลักสูตร (Topic -> Lesson/Quiz)</p>
+		</div>
+		<div class="p-6">
+			<?php if ( empty( $stats['content_insights'] ) ) : ?>
+				<div class="text-center py-8 text-gray-500">
+					ไม่มีข้อมูลโครงสร้างหลักสูตรสำหรับคอร์สนี้
+				</div>
+			<?php else : ?>
+				<div class="space-y-4">
+					<?php foreach ( $stats['content_insights'] as $topic ) : ?>
+						<div class="border border-gray-200 rounded-lg overflow-hidden">
+							<!-- Topic Header -->
+							<div class="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+								<h4 class="font-semibold text-gray-800 m-0"><?php echo esc_html( $topic['title'] ); ?></h4>
+								<span class="text-xs text-gray-500"><?php echo count( $topic['contents'] ); ?> รายการ</span>
+							</div>
+							
+							<!-- Lessons & Quizzes -->
+							<ul class="divide-y divide-gray-100 m-0 p-0 list-none">
+								<?php if ( empty( $topic['contents'] ) ) : ?>
+									<li class="px-4 py-3 text-sm text-gray-400">ไม่มีบทเรียนในหัวข้อนี้</li>
+								<?php else : ?>
+									<?php foreach ( $topic['contents'] as $content ) : ?>
+										<li class="px-4 py-3 hover:bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+											<div class="flex items-center gap-3">
+												<?php if ( $content['type'] === 'tutor_quiz' ) : ?>
+													<span class="w-8 h-8 rounded bg-yellow-100 text-yellow-600 flex items-center justify-center shrink-0">
+														<i class="ti ti-help-hexagon text-lg"></i>
+													</span>
+												<?php else : ?>
+													<span class="w-8 h-8 rounded bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+														<i class="ti ti-file-text text-lg"></i>
+													</span>
+												<?php endif; ?>
+												<span class="text-sm font-medium text-gray-700"><?php echo esc_html( $content['title'] ); ?></span>
+											</div>
+											
+											<div class="flex items-center gap-4 text-sm text-gray-600 shrink-0">
+												<?php if ( $content['type'] === 'lesson' ) : ?>
+													<div class="flex items-center gap-1 bg-green-50 text-green-700 px-2 py-1 rounded">
+														<i class="ti ti-check"></i>
+														<span>เรียนจบแล้ว <?php echo (int) $content['completed_count']; ?> คน</span>
+													</div>
+												<?php elseif ( $content['type'] === 'tutor_quiz' ) : ?>
+													<div class="flex items-center gap-4 bg-yellow-50 text-yellow-800 px-3 py-1 rounded">
+														<div class="flex flex-col text-xs text-center border-r border-yellow-200 pr-3">
+															<span class="font-bold"><?php echo esc_html( $content['avg_score'] ); ?>%</span>
+															<span class="text-yellow-600" style="font-size: 10px;">คะแนนเฉลี่ย</span>
+														</div>
+														<div class="flex flex-col text-xs text-center">
+															<span class="font-bold"><?php echo esc_html( $content['avg_attempts_per_user'] ); ?> ครั้ง</span>
+															<span class="text-yellow-600" style="font-size: 10px;">เฉลี่ยต่อคน</span>
+														</div>
+													</div>
+												<?php endif; ?>
+											</div>
+										</li>
+									<?php endforeach; ?>
+								<?php endif; ?>
+							</ul>
+						</div>
+					<?php endforeach; ?>
+				</div>
+			<?php endif; ?>
 		</div>
 	</div>
 
