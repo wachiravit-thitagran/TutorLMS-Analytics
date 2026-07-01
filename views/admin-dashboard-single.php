@@ -212,7 +212,7 @@ $course_title = get_the_title( $course_id );
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 			<!-- NPS Card -->
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-				<h3 class="text-lg font-semibold text-gray-800 mb-2">Net Promoter Score (NPS)</h3>
+				<h3 class="text-lg font-semibold text-gray-800 mb-2">คะแนนความพึงพอใจ (NPS)</h3>
 				<p class="text-sm text-gray-500 mb-4">4-5★ = Promoter, 3★ = Passive, 1-2★ = Detractor</p>
 				<?php
 					$nps = $stats['rating_analytics']['nps_score'] ?? array('score' => 0, 'promoters' => 0, 'passives' => 0, 'detractors' => 0, 'total' => 0);
@@ -383,7 +383,7 @@ $course_title = get_the_title( $course_id );
 		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
 				<div class="px-6 py-4 border-b border-gray-100">
-					<h3 class="text-lg font-semibold text-gray-800">Completion Rate by Enrollment Cohort</h3>
+					<h3 class="text-lg font-semibold text-gray-800">อัตราการเรียนจบตามกลุ่มผู้สมัคร (Cohort)</h3>
 					<p class="text-sm text-gray-500">เปรียบเทียบผู้เรียนที่สมัครในแต่ละเดือนว่าเรียนจบกี่เปอร์เซ็นต์</p>
 				</div>
 				<?php $cohorts = $stats['cohort_analytics']['completion_by_enrollment_cohort'] ?? []; ?>
@@ -403,7 +403,7 @@ $course_title = get_the_title( $course_id );
 
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
 				<div class="px-6 py-4 border-b border-gray-100">
-					<h3 class="text-lg font-semibold text-gray-800">Retention by Week</h3>
+					<h3 class="text-lg font-semibold text-gray-800">อัตราการเข้าเรียนอย่างต่อเนื่องรายสัปดาห์ (Retention)</h3>
 					<p class="text-sm text-gray-500">สัปดาห์ที่ 1/2/3 ยังมีผู้เรียน active อยู่กี่เปอร์เซ็นต์</p>
 				</div>
 				<?php $retention = $stats['cohort_analytics']['retention_by_week'] ?? []; ?>
