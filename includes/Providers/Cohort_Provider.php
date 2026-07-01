@@ -31,7 +31,7 @@ class Cohort_Provider {
 				ON c.user_id = e.post_author
 				AND c.comment_post_ID = e.post_parent
 				AND c.comment_type = 'course_completed'
-				AND c.comment_approved = 'approved'
+				AND c.comment_approved IN ('approved', '1')
 			WHERE {$where}
 			GROUP BY cohort
 			ORDER BY cohort ASC

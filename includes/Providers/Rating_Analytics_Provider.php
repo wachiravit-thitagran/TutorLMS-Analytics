@@ -23,7 +23,7 @@ class Rating_Analytics_Provider {
 	public function get_rating_distribution( int $course_id = 0 ): array {
 		global $wpdb;
 
-		$where = "c.comment_type = 'tutor_course_rating' AND c.comment_approved = 'approved' AND m.meta_key = 'tutor_rating'";
+		$where = "c.comment_type = 'tutor_course_rating' AND c.comment_approved IN ('approved', '1') AND m.meta_key = 'tutor_rating'";
 		if ( $course_id > 0 ) {
 			$where .= $wpdb->prepare( " AND c.comment_post_ID = %d", $course_id );
 		}
@@ -64,7 +64,7 @@ class Rating_Analytics_Provider {
 	public function get_nps_score( int $course_id = 0 ): array {
 		global $wpdb;
 
-		$where = "c.comment_type = 'tutor_course_rating' AND c.comment_approved = 'approved' AND m.meta_key = 'tutor_rating'";
+		$where = "c.comment_type = 'tutor_course_rating' AND c.comment_approved IN ('approved', '1') AND m.meta_key = 'tutor_rating'";
 		if ( $course_id > 0 ) {
 			$where .= $wpdb->prepare( " AND c.comment_post_ID = %d", $course_id );
 		}
@@ -109,7 +109,7 @@ class Rating_Analytics_Provider {
 	public function get_rating_trend( int $course_id = 0 ): array {
 		global $wpdb;
 
-		$where = "c.comment_type = 'tutor_course_rating' AND c.comment_approved = 'approved' AND m.meta_key = 'tutor_rating' AND c.comment_date >= DATE_SUB(NOW(), INTERVAL 6 MONTH)";
+		$where = "c.comment_type = 'tutor_course_rating' AND c.comment_approved IN ('approved', '1') AND m.meta_key = 'tutor_rating' AND c.comment_date >= DATE_SUB(NOW(), INTERVAL 6 MONTH)";
 		if ( $course_id > 0 ) {
 			$where .= $wpdb->prepare( " AND c.comment_post_ID = %d", $course_id );
 		}
@@ -148,14 +148,14 @@ class Rating_Analytics_Provider {
 		global $wpdb;
 
 		// Count completions
-		$complete_where = "comment_type = 'course_completed' AND comment_approved = 'approved'";
+		$complete_where = "comment_type = 'course_completed' AND comment_approved IN ('approved', '1')";
 		if ( $course_id > 0 ) {
 			$complete_where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
 		}
 		$completions = (int) $wpdb->get_var( "SELECT COUNT(DISTINCT user_id) FROM {$wpdb->comments} WHERE {$complete_where} AND user_id > 0" );
 
 		// Count reviews
-		$review_where = "comment_type = 'tutor_course_rating' AND comment_approved = 'approved'";
+		$review_where = "comment_type = 'tutor_course_rating' AND comment_approved IN ('approved', '1')";
 		if ( $course_id > 0 ) {
 			$review_where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
 		}

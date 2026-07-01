@@ -66,7 +66,7 @@ class Content_Gap_Provider {
 				FROM {$wpdb->comments}
 				WHERE comment_type = 'lesson_completed'
 				  AND comment_post_ID = %d
-				  AND comment_approved = 'approved'
+				  AND comment_approved IN ('approved', '1')
 			", (int) $lesson['ID'] ) );
 
 			$lesson_completions[] = array(
@@ -311,7 +311,7 @@ class Content_Gap_Provider {
 			$completed = (int) $wpdb->get_var( $wpdb->prepare( "
 				SELECT COUNT(DISTINCT user_id)
 				FROM {$wpdb->comments}
-				WHERE comment_type = 'lesson_completed' AND comment_post_ID = %d AND comment_approved = 'approved'
+				WHERE comment_type = 'lesson_completed' AND comment_post_ID = %d AND comment_approved IN ('approved', '1')
 			", (int) $lesson['ID'] ) );
 			$completion_pct = round( ( $completed / $total_enrolled ) * 100, 1 );
 			$data[] = array(
@@ -369,7 +369,7 @@ class Content_Gap_Provider {
 				SELECT COUNT(DISTINCT user_id)
 				FROM {$wpdb->comments} c
 				INNER JOIN {$wpdb->posts} p ON c.comment_post_ID = p.ID
-				WHERE p.post_parent = %d AND p.post_type = 'lesson' AND c.comment_type = 'lesson_completed' AND c.comment_approved = 'approved'
+				WHERE p.post_parent = %d AND p.post_type = 'lesson' AND c.comment_type = 'lesson_completed' AND c.comment_approved IN ('approved', '1')
 			", $topic_id ) );
 
 			$lesson_completion_pct = $total_enrolled > 0 ? round( ($lesson_count / $total_enrolled) * 100, 1 ) : 0;

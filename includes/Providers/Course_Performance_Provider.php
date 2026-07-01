@@ -40,13 +40,13 @@ class Course_Performance_Provider {
 			$completions = (int) $wpdb->get_var( $wpdb->prepare( "
 				SELECT COUNT(DISTINCT comment_ID) 
 				FROM {$wpdb->comments} 
-				WHERE comment_post_ID = %d AND comment_type = 'course_completed' AND comment_approved = 'approved'
+				WHERE comment_post_ID = %d AND comment_type = 'course_completed' AND comment_approved IN ('approved', '1')
 			", $cid ) );
 
 			$completion_rate = $learners > 0 ? round( ( $completions / $learners ) * 100, 1 ) : 0;
 
 			// 3. Avg Rating
-			$rating_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(comment_ID) FROM {$wpdb->comments} WHERE comment_post_ID = %d AND comment_type = 'tutor_course_rating' AND comment_approved = 'approved'", $cid ) );
+			$rating_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(comment_ID) FROM {$wpdb->comments} WHERE comment_post_ID = %d AND comment_type = 'tutor_course_rating' AND comment_approved IN ('approved', '1')", $cid ) );
 			
 			$avg_rating = 0;
 			if ( $rating_count > 0 ) {
@@ -54,7 +54,7 @@ class Course_Performance_Provider {
 					SELECT SUM(m.meta_value) 
 					FROM {$wpdb->commentmeta} m 
 					INNER JOIN {$wpdb->comments} c ON m.comment_id = c.comment_ID 
-					WHERE c.comment_post_ID = %d AND c.comment_type = 'tutor_course_rating' AND c.comment_approved = 'approved' AND m.meta_key = 'tutor_rating'
+					WHERE c.comment_post_ID = %d AND c.comment_type = 'tutor_course_rating' AND c.comment_approved IN ('approved', '1') AND m.meta_key = 'tutor_rating'
 				", $cid ) );
 				$avg_rating = round( $total_rating / $rating_count, 1 );
 			}
