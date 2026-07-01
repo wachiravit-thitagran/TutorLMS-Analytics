@@ -329,4 +329,34 @@ tla_assert( $malicious_event !== null, "Malicious event saved to DB." );
 tla_assert_not_contains( $malicious_event->event_value, '<script>', "REST Endpoint sanitizes HTML tags from event_value." );
 
 
+// -----------------------------------------------------------------------------
+// Test 15: Priority 3.x - Drop-off calculation with WP native comment_approved = '1'
+// -----------------------------------------------------------------------------
+echo "\n--- Test: Drop-off calculation & comment_approved = '1' ---\n";
+$course_dropoff = wp_insert_post(['post_type' => 'courses', 'post_title' => 'Dropoff Test Course', 'post_status' => 'publish']);
+$topic_dropoff = wp_insert_post(['post_type' => 'topics', 'post_parent' => $course_dropoff, 'post_status' => 'publish']);
+$lesson_dropoff = wp_insert_post(['post_type' => 'lesson', 'post_title' => 'Dropoff Lesson', 'post_parent' => $topic_dropoff, 'post_status' => 'publish', 'menu_order' => 1]);
+
+$user_a = wp_create_user( 'drop_a_' . wp_generate_password(4, false), 'drop_pass', 'drop_a_' . wp_generate_password(4, false) . '@test.com' );
+$user_b = wp_create_user( 'drop_b_' . wp_generate_password(4, false), 'drop_pass', 'drop_b_' . wp_generate_password(4, false) . '@test.com' );
+
+wp_insert_post(['post_type' => 'tutor_enrolled', 'post_parent' => $course_dropoff, 'post_author' => $user_a, 'post_status' => 'completed']);
+wp_insert_post(['post_type' => 'tutor_enrolled', 'post_parent' => $course_dropoff, 'post_author' => $user_b, 'post_status' => 'completed']);
+
+wp_insert_comment(array(
+	'comment_post_ID'  => $lesson_dropoff,
+	'user_id'          => $user_a,
+	'comment_type'     => 'lesson_completed',
+	'comment_approved' => '1',
+));
+
+$_GET['course_id'] = $course_dropoff;
+ob_start();
+$menu->render_page();
+$output_dropoff = ob_get_clean();
+unset( $_GET['course_id'] );
+
+tla_assert_contains( $output_dropoff, '-50%', "Drop-off calculates correctly with comment_approved = '1'." );
+tla_assert_contains( $output_dropoff, 'หายไป 1 คน', "Drop-off count correctly identifies 1 missing person." );
+
 echo "\n🎉 All comprehensive integration tests passed successfully!\n";
