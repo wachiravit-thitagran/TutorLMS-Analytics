@@ -168,21 +168,22 @@ class Engagement_Provider {
 			return [];
 		}
 
-		$where = 'user_id > 0';
+		$where = "ev.user_id > 0 AND p.post_type = 'tutor_enrolled' AND p.post_status IN ('completed', 'processing', 'publish')";
 		if ( $course_id > 0 ) {
-			$where .= $wpdb->prepare( ' AND course_id = %d', $course_id );
+			$where .= $wpdb->prepare( ' AND ev.course_id = %d AND p.post_parent = %d', $course_id, $course_id );
 		}
 
 		$rows = $wpdb->get_results( "
 			SELECT
-				user_id,
-				SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as events_7d,
-				SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 14 DAY) AND created_at < DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as events_prev_7d,
-				MAX(created_at) as last_activity
-			FROM {$events_table}
+				ev.user_id,
+				SUM(CASE WHEN ev.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as events_7d,
+				SUM(CASE WHEN ev.created_at >= DATE_SUB(NOW(), INTERVAL 14 DAY) AND ev.created_at < DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as events_prev_7d,
+				MAX(ev.created_at) as last_activity
+			FROM {$events_table} ev
+			INNER JOIN {$wpdb->posts} p ON p.post_author = ev.user_id
 			WHERE {$where}
-			  AND created_at >= DATE_SUB(NOW(), INTERVAL 14 DAY)
-			GROUP BY user_id
+			  AND ev.created_at >= DATE_SUB(NOW(), INTERVAL 14 DAY)
+			GROUP BY ev.user_id
 			ORDER BY events_7d DESC
 			LIMIT {$limit}
 		", ARRAY_A );
@@ -216,14 +217,15 @@ class Engagement_Provider {
 			return [];
 		}
 
-		$where = 'ev.user_id > 0 AND ev.created_at >= DATE_SUB(NOW(), INTERVAL 14 DAY)';
+		$where = "ev.user_id > 0 AND ev.created_at >= DATE_SUB(NOW(), INTERVAL 14 DAY) AND p.post_type = 'tutor_enrolled' AND p.post_status IN ('completed', 'processing', 'publish')";
 		if ( $course_id > 0 ) {
-			$where .= $wpdb->prepare( ' AND ev.course_id = %d', $course_id );
+			$where .= $wpdb->prepare( ' AND ev.course_id = %d AND p.post_parent = %d', $course_id, $course_id );
 		}
 
 		$rows = $wpdb->get_results( "
-			SELECT ev.user_id, COUNT(*) as events_14d, MAX(ev.created_at) as last_activity
+			SELECT ev.user_id, COUNT(ev.id) as events_14d, MAX(ev.created_at) as last_activity
 			FROM {$events_table} ev
+			INNER JOIN {$wpdb->posts} p ON p.post_author = ev.user_id
 			WHERE {$where}
 			GROUP BY ev.user_id
 			HAVING events_14d >= 10
