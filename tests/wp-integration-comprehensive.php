@@ -106,7 +106,7 @@ $menu->render_page();
 $output_empty = ob_get_clean();
 
 tla_assert_contains( $output_empty, 'Tutor Analytics', "Global dashboard renders without fatal error." );
-tla_assert_contains( $output_empty, 'ผู้เรียนที่สมัคร', "Global dashboard contains general summary metrics." );
+tla_assert_contains( $output_empty, 'ผู้เรียนทั้งหมด', "Global dashboard contains general summary metrics." );
 // Note: Depending on UI, it might just render '0' or specific empty messages.
 tla_assert_contains( $output_empty, '0', "Empty state renders zero values correctly." );
 
