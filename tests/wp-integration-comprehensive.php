@@ -80,23 +80,14 @@ wp_set_current_user( $subscriber_id );
 
 tla_assert( ! current_user_can( $capability ), "Subscriber does not have 'manage_tutor' capability." );
 
-// Switch back to admin
-$admin_user = get_user_by( 'login', 'admin' );
-if ( ! $admin_user ) {
-    $admin_users = get_users(['role' => 'administrator']);
-    if (!empty($admin_users)) {
-        $admin_user = $admin_users[0];
-    }
-}
+// Switch back to admin (create one to be sure)
+$admin_id = wp_create_user( 'admin_test_' . wp_generate_password(4, false), 'admin_pass', 'admin_test_' . wp_generate_password(4, false) . '@example.com' );
+$admin_user = new WP_User( $admin_id );
+$admin_user->set_role( 'administrator' );
+$admin_user->add_cap( 'manage_tutor' );
+wp_set_current_user( $admin_id );
 
-if ( $admin_user ) {
-    // Add capability if not present (sometimes Tutor isn't fully active in test)
-    $admin_user->add_cap( 'manage_tutor' );
-    wp_set_current_user( $admin_user->ID );
-    tla_assert( current_user_can( $capability ), "Admin has 'manage_tutor' capability." );
-} else {
-    echo "⚠️ Warning: Admin user not found, skipping admin capability check.\n";
-}
+tla_assert( current_user_can( $capability ), "Admin has 'manage_tutor' capability." );
 
 
 // -----------------------------------------------------------------------------
