@@ -602,7 +602,7 @@ $course_title = get_the_title( $course_id );
 		<div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
 			<h3 class="text-lg font-semibold text-gray-800">ตารางความคืบหน้าของผู้เรียน</h3>
 		</div>
-		<div class="overflow-x-auto">
+		<div class="overflow-x-auto" x-data="{ expandedUser: null, page: 1, perPage: 10, total: <?php echo count($stats['student_table']); ?>, get totalPages() { return Math.ceil(this.total / this.perPage); } }">
 			<table class="min-w-full divide-y divide-gray-200">
 				<thead class="bg-gray-50">
 					<tr>
@@ -613,9 +613,9 @@ $course_title = get_the_title( $course_id );
 						<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">เข้าเรียนล่าสุด</th>
 					</tr>
 				</thead>
-				<tbody class="bg-white divide-y divide-gray-200" x-data="{ expandedUser: null }">
-					<?php foreach ( $stats['student_table'] as $s ) : ?>
-					<tr @click="expandedUser = expandedUser === <?php echo $s['user_id']; ?> ? null : <?php echo $s['user_id']; ?>" class="cursor-pointer hover:bg-gray-50 transition-colors">
+				<tbody class="bg-white divide-y divide-gray-200">
+					<?php $s_index = 0; foreach ( $stats['student_table'] as $s ) : $s_index++; ?>
+					<tr x-show="page === Math.ceil(<?php echo $s_index; ?> / perPage)" @click="expandedUser = expandedUser === <?php echo $s['user_id']; ?> ? null : <?php echo $s['user_id']; ?>" class="cursor-pointer hover:bg-gray-50 transition-colors">
 						<td class="px-6 py-4 whitespace-nowrap">
 							<div class="flex items-center gap-3">
 								<i class="ti ti-chevron-down text-gray-400 transition-transform" :class="expandedUser === <?php echo $s['user_id']; ?> ? 'rotate-180' : ''"></i>
@@ -659,7 +659,7 @@ $course_title = get_the_title( $course_id );
 						</td>
 					</tr>
 					<!-- Expanded Details Row -->
-					<tr x-show="expandedUser === <?php echo $s['user_id']; ?>" x-cloak class="bg-gray-50/50">
+					<tr x-show="expandedUser === <?php echo $s['user_id']; ?> && page === Math.ceil(<?php echo $s_index; ?> / perPage)" x-cloak class="bg-gray-50/50">
 
 						<td colspan="5" class="px-6 py-4">
 							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -697,6 +697,21 @@ $course_title = get_the_title( $course_id );
 					<?php endforeach; ?>
 				</tbody>
 			</table>
+			
+			<!-- Pagination Controls -->
+			<div class="px-6 py-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4" x-show="total > perPage">
+				<div class="text-sm text-gray-500">
+					แสดง <span class="font-medium" x-text="total === 0 ? 0 : ((page - 1) * perPage) + 1"></span> ถึง <span class="font-medium" x-text="Math.min(page * perPage, total)"></span> จาก <span class="font-medium" x-text="total"></span> รายการ
+				</div>
+				<div class="flex items-center gap-2">
+					<button @click="page > 1 ? page-- : null" :disabled="page === 1" class="px-3 py-1.5 border border-gray-200 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition">
+						<i class="ti ti-chevron-left mr-1"></i> ก่อนหน้า
+					</button>
+					<button @click="page < totalPages ? page++ : null" :disabled="page === totalPages" class="px-3 py-1.5 border border-gray-200 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition">
+						ถัดไป <i class="ti ti-chevron-right ml-1"></i>
+					</button>
+				</div>
+			</div>
 		</div>
 	</div>
 
