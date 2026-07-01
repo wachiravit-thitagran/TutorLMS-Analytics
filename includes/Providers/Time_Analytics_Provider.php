@@ -127,8 +127,8 @@ class Time_Analytics_Provider {
 			FROM {$table_name}
 			WHERE {$where}
 			GROUP BY lesson_id
-			HAVING total_views > unique_learners
-			ORDER BY (total_views - unique_learners) DESC
+			HAVING COUNT(*) > COUNT(DISTINCT user_id)
+			ORDER BY (COUNT(*) - COUNT(DISTINCT user_id)) DESC
 			LIMIT {$limit}
 		", ARRAY_A );
 

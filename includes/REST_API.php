@@ -28,7 +28,7 @@ class REST_API {
 	public function handle_track( WP_REST_Request $request ): WP_REST_Response {
 		global $wpdb;
 
-		$params = $request->get_json_params();
+		$params = $request->get_params();
 		if ( empty( $params['event_type'] ) ) {
 			return rest_ensure_response( array( 'success' => false, 'error' => 'Missing event_type' ) );
 		}
@@ -75,9 +75,9 @@ class REST_API {
 
 	private function parse_browser( string $ua ): string {
 		if ( stripos( $ua, 'Edg' ) !== false || stripos( $ua, 'Edge' ) !== false ) return 'Edge';
+		if ( stripos( $ua, 'Firefox' ) !== false ) return 'Firefox';
 		if ( stripos( $ua, 'Chrome' ) !== false ) return 'Chrome';
 		if ( stripos( $ua, 'Safari' ) !== false ) return 'Safari';
-		if ( stripos( $ua, 'Firefox' ) !== false ) return 'Firefox';
 		return 'Other';
 	}
 }
