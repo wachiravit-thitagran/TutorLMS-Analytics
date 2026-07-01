@@ -129,8 +129,8 @@ class Quiz_Provider {
 			{$join}
 			WHERE {$where}
 			GROUP BY a.question_id, qa.quiz_id
-			HAVING attempts > 0
-			ORDER BY (correct_count / attempts) ASC, attempts DESC
+			HAVING COUNT(*) > 0
+			ORDER BY (SUM(CASE WHEN CAST(a.achieved_mark AS DECIMAL(10,2)) > 0 THEN 1 ELSE 0 END) / COUNT(*)) ASC, COUNT(*) DESC
 			LIMIT {$limit}
 		", ARRAY_A );
 
@@ -172,7 +172,7 @@ class Quiz_Provider {
 			{$join}
 			WHERE {$where}
 			GROUP BY a.question_id, a.given_answer
-			ORDER BY selected_count DESC
+			ORDER BY COUNT(*) DESC
 			LIMIT {$limit}
 		", ARRAY_A );
 
@@ -218,7 +218,7 @@ class Quiz_Provider {
 				GROUP BY q.quiz_id, q.user_id, q.attempt_id
 			) passed_attempts
 			GROUP BY quiz_id
-			ORDER BY avg_attempts_before_pass DESC
+			ORDER BY AVG(attempt_number) DESC
 			LIMIT {$limit}
 		", ARRAY_A );
 
@@ -262,7 +262,7 @@ class Quiz_Provider {
 			WHERE {$where}
 			  AND (failed.earned_marks / failed.total_marks * 100) < COALESCE(NULLIF(pm.meta_value, ''), 80)
 			GROUP BY failed.quiz_id
-			ORDER BY retried_users DESC
+			ORDER BY COUNT(DISTINCT retry.user_id) DESC
 			LIMIT {$limit}
 		", ARRAY_A );
 
