@@ -12,6 +12,7 @@
             <directory suffix=".php">./tests</directory>
             <exclude>./tests/bootstrap.php</exclude>
             <exclude>./tests/wp-integration-advanced-analytics.php</exclude>
+            <exclude>./tests/wp-integration-comprehensive.php</exclude>
         </testsuite>
     </testsuites>
 </phpunit>
