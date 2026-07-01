@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div x-show="tab === 'overview'" x-cloak>
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
-				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">ผู้เรียนทั้งหมด</h3>
+				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">ผู้เรียนที่สมัคร</h3>
 				<p class="text-2xl font-bold text-gray-900"><i class="ti ti-users text-blue-500"></i> <?php echo number_format( $stats['total_students'] ); ?></p>
 			</div>
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
