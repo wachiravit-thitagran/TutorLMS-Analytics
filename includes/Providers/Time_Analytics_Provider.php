@@ -197,7 +197,7 @@ class Time_Analytics_Provider {
 		global $wpdb;
 
 		$where_enroll   = "e.post_type = 'tutor_enrolled' AND e.post_status IN ('completed', 'processing', 'publish')";
-		$where_complete = "c.comment_type = 'course_completed' AND c.comment_approved = 'approved'";
+		$where_complete = "c.comment_type = 'course_completed' AND c.comment_approved IN ('approved', '1')";
 
 		if ( $course_id > 0 ) {
 			$where_enroll   .= $wpdb->prepare( " AND e.post_parent = %d", $course_id );

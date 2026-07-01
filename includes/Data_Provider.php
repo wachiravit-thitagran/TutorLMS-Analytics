@@ -42,7 +42,7 @@ class Data_Provider {
 
 	private function get_total_course_completions( int $course_id ): int {
 		global $wpdb;
-		$where = "comment_type = 'course_completed' AND comment_approved = 'approved'";
+		$where = "comment_type = 'course_completed' AND comment_approved IN ('approved', '1')";
 		if ( $course_id > 0 ) {
 			$where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
 		}
@@ -81,7 +81,7 @@ class Data_Provider {
 	private function get_daily_completions_30_days( int $course_id ): array {
 		global $wpdb;
 		
-		$where = "comment_type = 'course_completed' AND comment_approved = 'approved' AND comment_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+		$where = "comment_type = 'course_completed' AND comment_approved IN ('approved', '1') AND comment_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
 		if ( $course_id > 0 ) {
 			$where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
 		}
@@ -110,7 +110,7 @@ class Data_Provider {
 		global $wpdb;
 		
 		$types = "'course_completed', 'lesson_completed', 'tutor_quiz_attempt', 'assignment_submitted'";
-		$where = "comment_type IN ($types) AND comment_approved = 'approved' AND user_id > 0 AND comment_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+		$where = "comment_type IN ($types) AND comment_approved IN ('approved', '1') AND user_id > 0 AND comment_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
 		if ( $course_id > 0 ) {
 			$where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
 		}
@@ -200,7 +200,7 @@ class Data_Provider {
 		global $wpdb;
 		
 		$types = "'course_completed', 'lesson_completed', 'tutor_quiz_attempt', 'assignment_submitted'";
-		$where = "comment_type IN ($types) AND comment_approved = 'approved' AND comment_date >= DATE_SUB(NOW(), INTERVAL 90 DAY)";
+		$where = "comment_type IN ($types) AND comment_approved IN ('approved', '1') AND comment_date >= DATE_SUB(NOW(), INTERVAL 90 DAY)";
 		if ( $course_id > 0 ) {
 			$where .= $wpdb->prepare( " AND comment_post_ID = %d", $course_id );
 		}
@@ -285,7 +285,7 @@ class Data_Provider {
 						FROM {$wpdb->comments} 
 						WHERE comment_type = 'lesson_completed' 
 						  AND comment_post_ID = %d 
-						  AND comment_approved = 'approved'
+						  AND comment_approved IN ('approved', '1')
 					", $content_id ) );
 					$item['completed_count'] = (int) $completed_count;
 					

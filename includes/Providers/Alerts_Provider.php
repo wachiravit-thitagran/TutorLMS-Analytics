@@ -18,7 +18,7 @@ class Alerts_Provider {
 		global $wpdb;
 		$alerts = array();
 
-		$where = "c.comment_type = 'tutor_course_rating' AND c.comment_approved = 'approved' AND m.meta_key = 'tutor_rating' AND CAST(m.meta_value AS UNSIGNED) <= 2";
+		$where = "c.comment_type = 'tutor_course_rating' AND c.comment_approved IN ('approved', '1') AND m.meta_key = 'tutor_rating' AND CAST(m.meta_value AS UNSIGNED) <= 2";
 		if ( $course_id > 0 ) {
 			$where .= $wpdb->prepare( " AND c.comment_post_ID = %d", $course_id );
 		}
