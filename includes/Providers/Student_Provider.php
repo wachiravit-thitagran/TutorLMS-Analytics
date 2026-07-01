@@ -8,7 +8,7 @@ class Student_Provider {
 	/**
 	 * Get table data for student progress.
 	 */
-	public function get_student_table( int $course_id = 0, int $limit = 50 ): array {
+	public function get_student_table( int $course_id = 0, int $limit = 0 ): array {
 		global $wpdb;
 
 		// Get latest enrolled users
@@ -18,6 +18,7 @@ class Student_Provider {
 		}
 
 		// We use a subquery or group by to get unique users and their latest enrollment date
+		$limit_clause = $limit > 0 ? $wpdb->prepare( "LIMIT %d", $limit ) : "";
 		$query = "
 			SELECT 
 				p.post_author as user_id, 
@@ -27,9 +28,9 @@ class Student_Provider {
 			WHERE {$where}
 			GROUP BY p.post_author
 			ORDER BY last_enrolled DESC
-			LIMIT %d
+			{$limit_clause}
 		";
-		$users = $wpdb->get_results( $wpdb->prepare( $query, $limit ), ARRAY_A );
+		$users = $wpdb->get_results( $query, ARRAY_A );
 
 		if ( empty( $users ) ) {
 			return array();
