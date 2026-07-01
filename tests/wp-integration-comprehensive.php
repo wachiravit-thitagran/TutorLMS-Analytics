@@ -105,7 +105,7 @@ $menu = new \TutorLMS_Analytics\Admin_Menu();
 $menu->render_page();
 $output_empty = ob_get_clean();
 
-tla_assert_contains( $output_empty, 'Tutor Analytics', "Global dashboard renders without fatal error." );
+tla_assert_contains( $output_empty, 'Global Learning Analytics', "Global dashboard renders without fatal error." );
 tla_assert_contains( $output_empty, 'ผู้เรียนที่สมัคร', "Global dashboard contains general summary metrics." );
 // Note: Depending on UI, it might just render '0' or specific empty messages.
 tla_assert_contains( $output_empty, '0', "Empty state renders zero values correctly." );
@@ -197,7 +197,7 @@ $menu->render_page();
 $output_missing_tables = ob_get_clean();
 unset( $_GET['course_id'] );
 
-tla_assert_contains( $output_missing_tables, 'Tutor Analytics', "Dashboard renders without fatal error even when quiz tables are missing." );
+tla_assert_contains( $output_missing_tables, 'Global Learning Analytics', "Dashboard renders without fatal error even when quiz tables are missing." );
 
 
 // -----------------------------------------------------------------------------
@@ -253,7 +253,7 @@ $wpdb->query( "INSERT INTO {$table_name} (user_id, course_id, lesson_id, event_t
 ob_start();
 $menu->render_page();
 $output_large = ob_get_clean();
-tla_assert_contains( $output_large, 'Tutor Analytics', "Dashboard renders successfully with 500+ events." );
+tla_assert_contains( $output_large, 'Global Learning Analytics', "Dashboard renders successfully with 500+ events." );
 
 
 // -----------------------------------------------------------------------------
