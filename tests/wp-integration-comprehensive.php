@@ -90,9 +90,9 @@ if ( ! $admin_user ) {
 }
 
 if ( $admin_user ) {
-    wp_set_current_user( $admin_user->ID );
     // Add capability if not present (sometimes Tutor isn't fully active in test)
     $admin_user->add_cap( 'manage_tutor' );
+    wp_set_current_user( $admin_user->ID );
     tla_assert( current_user_can( $capability ), "Admin has 'manage_tutor' capability." );
 } else {
     echo "⚠️ Warning: Admin user not found, skipping admin capability check.\n";
