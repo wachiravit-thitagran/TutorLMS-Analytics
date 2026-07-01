@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="flex justify-between items-center mb-6 mt-4">
 		<div>
 			<h1 class="wp-heading-inline !text-3xl !font-bold !m-0 text-gray-800">
-				<?php esc_html_e( 'Global Learning Analytics', 'tutorlms-analytics' ); ?>
+				<?php esc_html_e( 'Tutor Analytics', 'tutorlms-analytics' ); ?>
 			</h1>
 			<p class="text-sm text-gray-500 mt-1">ภาพรวมการเรียนรู้ของทั้งแพลตฟอร์ม</p>
 		</div>
