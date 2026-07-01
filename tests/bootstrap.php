@@ -211,6 +211,14 @@ class WP_REST_Request {
 	public function get_json_params() {
 		return $this->json_params;
 	}
+
+	public function get_params() {
+		return $this->json_params;
+	}
+
+	public function set_param( $key, $value ) {
+		$this->json_params[ $key ] = $value;
+	}
 }
 
 class WP_REST_Server {
