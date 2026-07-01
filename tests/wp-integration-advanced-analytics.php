@@ -239,9 +239,9 @@ $output = ob_get_clean();
 
 $expected = array(
 	'WP Integration Analytics Course',
-	'Completion Rate by Enrollment Cohort',
+	'อัตราการเรียนจบตามกลุ่มผู้สมัคร (Cohort)',
 	'33.3%',
-	'Retention by Week',
+	'อัตราการเข้าเรียนอย่างต่อเนื่องรายสัปดาห์ (Retention)',
 	'100%',
 	'High Intent but Stuck',
 	'Progress 20% /',
