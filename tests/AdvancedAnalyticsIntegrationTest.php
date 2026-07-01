@@ -170,8 +170,8 @@ class AdvancedAnalyticsIntegrationTest extends TestCase {
 		$this->assertStringContainsString( 'Seeded Course', $html );
 
 		// Cohort & retention block.
-		$this->assertStringContainsString( 'Completion Rate by Enrollment Cohort', $html );
-		$this->assertStringContainsString( 'Retention by Week', $html );
+		$this->assertStringContainsString( 'อัตราการเรียนจบตามกลุ่มผู้สมัคร (Cohort)', $html );
+		$this->assertStringContainsString( 'อัตราการเข้าเรียนอย่างต่อเนื่องรายสัปดาห์ (Retention)', $html );
 		$this->assertStringContainsString( '2026-01', $html );
 		$this->assertStringContainsString( '10', $html );
 		$this->assertStringContainsString( '4', $html );
