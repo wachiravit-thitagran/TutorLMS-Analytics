@@ -88,7 +88,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 			<!-- Activity by Day Graph -->
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-				<h3 class="text-lg font-semibold text-gray-800 mb-4">ความเคลื่อนไหวแยกตามวัน (90 วัน)</h3>
+				<h3 class="text-lg font-semibold text-gray-800 mb-4">Activity แยกตามวัน (90 วัน)</h3>
 				<div class="relative h-72 w-full">
 					<canvas id="activityByDayChart"></canvas>
 				</div>
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			data: {
 				labels: Object.keys(actDayData),
 				datasets: [{
-					label: 'กิจกรรม',
+					label: 'Activity',
 					data: Object.values(actDayData),
 					backgroundColor: 'rgba(139, 92, 246, 0.8)',
 				}]
@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			data: {
 				labels: gHrs,
 				datasets: [{
-					label: 'กิจกรรม',
+					label: 'Activity',
 					data: gCts,
 					backgroundColor: gCts.map(c => { const i = gMax > 0 ? c / gMax : 0; return `rgba(139, 92, 246, ${0.2 + i * 0.8})`; }),
 					borderRadius: 2,

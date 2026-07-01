@@ -176,7 +176,7 @@ $course_title = get_the_title( $course_id );
 			</div>
 			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
 				<h3 class="text-lg font-semibold text-gray-800 mb-1">ช่วงเวลาที่ผู้เรียนเข้าเรียน</h3>
-				<p class="text-sm text-gray-500 mb-4">กิจกรรมแยกตามชั่วโมง (90 วันล่าสุด)</p>
+				<p class="text-sm text-gray-500 mb-4">Activity แยกตามชั่วโมง (90 วันล่าสุด)</p>
 				<div class="relative h-72 w-full">
 					<canvas id="hourlyActivityChart"></canvas>
 				</div>
@@ -898,7 +898,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			data: {
 				labels: hours,
 				datasets: [{
-					label: 'กิจกรรม',
+					label: 'Activity',
 					data: counts,
 					backgroundColor: counts.map(c => {
 						const intensity = maxCount > 0 ? c / maxCount : 0;
