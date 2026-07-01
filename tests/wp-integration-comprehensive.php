@@ -6,8 +6,6 @@
  * Run with: wp eval-file tests/wp-integration-comprehensive.php --allow-root
  */
 
-declare(strict_types=1);
-
 if ( ! defined( 'ABSPATH' ) ) {
 	echo "This script must run inside WordPress.\n";
 	exit( 1 );

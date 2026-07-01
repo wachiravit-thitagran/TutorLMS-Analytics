@@ -5,7 +5,6 @@
  * Run with: wp eval-file bin/wp-integration-advanced-analytics.php --allow-root
  */
 
-declare(strict_types=1);
 
 if ( ! defined( 'ABSPATH' ) ) {
 	echo "This script must run inside WordPress.\n";
