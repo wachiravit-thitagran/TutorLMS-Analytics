@@ -1,0 +1,500 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TutorLMS Analytics 2.0.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: tutorlms-analytics\n"
+"Language: \n"
+
+#: tutorlms-analytics.php
+msgid "TutorLMS Analytics requires Tutor LMS to be installed and activated."
+msgstr ""
+
+#: includes/Export_Handler.php
+msgid "ไม่มีสิทธิ์เข้าถึง"
+msgstr ""
+
+#: includes/Export_Handler.php
+msgid "ลิงก์ส่งออกหมดอายุ กรุณาลองใหม่"
+msgstr ""
+
+#: includes/Data_Provider.php
+msgid "Unknown Course"
+msgstr ""
+
+#: includes/Admin_Menu.php views/admin-dashboard-global.php
+msgid "Tutor Analytics"
+msgstr ""
+
+#: includes/Admin_Menu.php
+msgid "สถิติเชิงลึก"
+msgstr ""
+
+#: includes/Admin_Menu.php
+msgid "กำลังโหลดข้อมูล…"
+msgstr ""
+
+#: includes/Admin_Menu.php
+msgid "โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่"
+msgstr ""
+
+#: includes/Admin_Menu.php
+msgid "ลองใหม่"
+msgstr ""
+
+#: includes/Admin_Menu.php
+msgid "ยังไม่มีข้อมูลในช่วงเวลานี้"
+msgstr ""
+
+#: includes/Admin_Menu.php
+msgid "เทียบช่วงก่อนหน้า"
+msgstr ""
+
+#: includes/Admin_Menu.php
+msgid "ข้อมูลไม่เพียงพอสำหรับการวิเคราะห์"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "ถูก/ผิด"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "เลือกตอบข้อเดียว"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "เลือกหลายคำตอบ"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "อัตนัย"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "เติมคำในช่องว่าง"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "ตอบสั้น"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "จับคู่"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "จับคู่รูปภาพ"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "ตอบจากรูปภาพ"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "เรียงลำดับ"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "วาดบนรูปภาพ (ใหม่ 4.0)"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "ปักหมุดบนรูปภาพ (ใหม่ 4.0)"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "กราฟ/พิกัด (ใหม่ 4.0)"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "สเกลช่วงค่า (ใหม่ 4.0)"
+msgstr ""
+
+#: includes/Providers/Quiz_Type_Provider.php
+msgid "พัซเซิล (ใหม่ 4.0)"
+msgstr ""
+
+#: includes/Providers/Gradebook_Provider.php
+msgid "ไม่ระบุเกรด"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "ภาพรวม"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "ประสิทธิภาพคอร์ส"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "รายได้และการขาย"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "คุณภาพและการมีส่วนร่วม"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "ภาพรวมการเรียนรู้ของทั้งแพลตฟอร์ม"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "หมวดสถิติ"
+msgstr ""
+
+#: views/admin-dashboard-global.php views/admin-dashboard-single.php
+msgid "แนวโน้มการสมัครเรียน"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "ผู้สมัครใหม่ต่อวันในช่วงที่เลือก"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "ผู้เข้าเรียน (Active)"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "จำนวนผู้เรียนที่มีกิจกรรมต่อวัน"
+msgstr ""
+
+#: views/admin-dashboard-global.php views/admin-dashboard-single.php
+msgid "ผู้ที่เรียนจบ"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "จำนวนการเรียนจบต่อวัน"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "สัดส่วนความนิยมของคอร์ส"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "คอร์สที่มีผู้ลงทะเบียนมากที่สุด"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "กิจกรรมแยกตามวัน"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "วันที่ผู้เรียนมีกิจกรรมมากที่สุด"
+msgstr ""
+
+#: views/admin-dashboard-global.php views/admin-dashboard-single.php
+msgid "อุปกรณ์ที่ใช้เรียน"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "Browser"
+msgstr ""
+
+#: views/admin-dashboard-global.php views/admin-dashboard-single.php
+msgid "ช่วงเวลาที่เข้าเรียน"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "Health = อัตราเรียนจบ (50) + คะแนนรีวิว (40) + มีผู้เรียน (10) — คลิกหัวคอลัมน์เพื่อจัดเรียง"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "ส่งออกคอร์ส (CSV)"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "ส่งออกผู้เรียน"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "ส่งออกรายได้"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "แนวโน้มรายได้สุทธิ"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "รายได้สุทธิรายวัน (รวม native + WooCommerce)"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "รายได้ตามประเภทคำสั่งซื้อ"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "ซื้อครั้งเดียว / สมาชิก / ต่ออายุ"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "ที่มาของการลงทะเบียน"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "Bundle / สมาชิก / ในระบบ / ภายนอก / เพิ่มเอง"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "สมาชิก (Subscriptions)"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "MRR เป็นค่าประมาณจากรายได้สมาชิกในช่วงที่เลือก"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "คูปองที่ใช้บ่อย"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "Course Bundles"
+msgstr ""
+
+#: views/admin-dashboard-global.php views/admin-dashboard-single.php
+msgid "ภาพรวมการมีส่วนร่วม"
+msgstr ""
+
+#: views/admin-dashboard-global.php views/admin-dashboard-single.php
+msgid "คำถามค้างตอบล่าสุด (Q&A)"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "ตอบเพื่อลดการทิ้งคอร์ส"
+msgstr ""
+
+#: views/admin-dashboard-global.php views/admin-dashboard-single.php
+msgid "ใบรับรองที่ออกรายเดือน"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "ย้อนหลัง 6 เดือน"
+msgstr ""
+
+#: views/admin-dashboard-global.php views/admin-dashboard-single.php
+msgid "ประเภทคำถามควิซ"
+msgstr ""
+
+#: views/admin-dashboard-global.php
+msgid "สีส้ม = คำถามแบบใหม่ใน Tutor LMS 4.0"
+msgstr ""
+
+#: views/admin-dashboard-global.php views/admin-dashboard-single.php
+msgid "การกระจายเกรด (Gradebook)"
+msgstr ""
+
+#: views/admin-dashboard-global.php views/admin-dashboard-single.php
+msgid "ต้องเปิดใช้ addon Gradebook"
+msgstr ""
+
+#: views/admin-dashboard-global.php views/admin-dashboard-single.php
+msgid "Live Lesson ที่กำลังจะมาถึง"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ภาพรวมการเรียนรู้"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ประสิทธิผลการสอน"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "เนื้อหาและจุดปรับปรุง"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "การประเมินผล"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "การมีส่วนร่วม"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ผู้เรียน"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ศูนย์จัดการ"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "กลับไปหน้าภาพรวม"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "สถิติรายคอร์ส"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "หมวดสถิติของคอร์ส"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "กราฟการเรียนต่อ (Survival Curve)"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "จุดที่กราฟตกชัน = บทเรียนที่ผู้เรียนทิ้งคอร์สมาก ควรตรวจสอบเนื้อหานั้น"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "สัดส่วนความคืบหน้า"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "การกระจายตัวของสถานะการเรียนปัจจุบัน"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "การกระจายคะแนนสอบ"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ใช้วัดว่าข้อสอบยากหรือง่ายเกินไป"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "สัดส่วนสอบผ่าน/ตก"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "อัตราการสอบผ่านเทียบกับการเข้าสอบทั้งหมด"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "เวลาที่ใช้ต่อบทเรียน"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "บทที่ใช้เวลานานผิดปกติอาจยากหรือยาวเกินไป"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "กิจกรรมแยกตามชั่วโมง"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "การกระจายรีวิว"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "จำนวนรีวิวแยกตามดาว"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "แนวโน้มคะแนนรีวิว"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ค่าเฉลี่ยรายเดือน (6 เดือน)"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ความพึงพอใจ (NPS)"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "4-5★ = Promoter, 3★ = Passive, 1-2★ = Detractor"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "บทเรียนที่มี Drop-off สูงสุด"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "จุดที่ผู้เรียนหยุดเรียนมากที่สุด"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ควิซที่ยากที่สุด"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ควิซที่มี Pass Rate ต่ำที่สุด"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "บทเรียนสุดท้ายก่อนหายไป (Exit)"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "บทเรียนที่เปิดซ้ำบ่อย"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "อาจเป็นเนื้อหาที่เข้าใจยาก"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "สถิติรายบทเรียนตามโครงสร้างหลักสูตร"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ความยากรายข้อ"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ข้อที่ตอบถูกน้อย = ยากหรือกำกวม"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "คำตอบผิดยอดนิยม"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "สีส้ม = คำถามแบบใหม่ใน Tutor LMS 4.0 (Draw, Pin, Coordinates, Scale, Puzzle)"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "งานที่มอบหมาย (Assignments)"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ตารางความคืบหน้าของผู้เรียน"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ค้นหา / จัดเรียงได้ทุกคอลัมน์"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "การแจ้งเตือน"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "ผู้เรียนกลุ่มเสี่ยง (At-Risk)"
+msgstr ""
+
+#: views/admin-dashboard-single.php
+msgid "Engagement ต่ำและความคืบหน้าน้อย"
+msgstr ""
+
+#: views/partials/date-range.php
+msgid "ช่วงเวลาสำเร็จรูป"
+msgstr ""
+
+#: views/partials/date-range.php
+msgid "7 วัน"
+msgstr ""
+
+#: views/partials/date-range.php
+msgid "30 วัน"
+msgstr ""
+
+#: views/partials/date-range.php
+msgid "90 วัน"
+msgstr ""
+
+#: views/partials/date-range.php
+msgid "จาก"
+msgstr ""
+
+#: views/partials/date-range.php
+msgid "ถึง"
+msgstr ""
+
+#: views/partials/date-range.php
+msgid "ใช้ช่วงเวลานี้"
+msgstr ""
+

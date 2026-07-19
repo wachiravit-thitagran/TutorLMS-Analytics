@@ -159,124 +159,58 @@ class AdvancedAnalyticsIntegrationTest extends TestCase {
 		$this->assertSame( 60.0, $diagnostics['retry_behavior'][0]['retry_rate'] );
 	}
 
-	public function test_single_course_dashboard_displays_seeded_advanced_statistics(): void {
-		$course_id = 123;
-		$stats = $this->seedDashboardStats();
+	public function test_single_course_dashboard_shell_renders_tabs_and_initial_payload(): void {
+		// The dashboard is now a JS-driven shell: it renders the tab structure
+		// and embeds the initial section payload as JSON; per-tab data is fetched
+		// lazily via REST. Assert the shell contract rather than server-rendered
+		// data rows.
+		$course_id       = 123;
+		$course_title    = 'Seeded Course';
+		$initial_section = 'insights';
+		$initial_data    = array( 'total_students' => 10, 'kpis' => array() );
+		$range           = \TutorLMS_Analytics\Date_Range::last_days( 30 );
 
 		ob_start();
 		require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard-single.php';
 		$html = ob_get_clean();
 
+		// Course header.
 		$this->assertStringContainsString( 'Seeded Course', $html );
 
-		// Cohort & retention block.
-		$this->assertStringContainsString( 'อัตราการเรียนจบตามกลุ่มผู้สมัคร (Cohort)', $html );
-		$this->assertStringContainsString( 'อัตราการเข้าเรียนอย่างต่อเนื่องรายสัปดาห์ (Retention)', $html );
-		$this->assertStringContainsString( '2026-01', $html );
-		$this->assertStringContainsString( '10', $html );
-		$this->assertStringContainsString( '4', $html );
-		$this->assertStringContainsString( '40%', $html );
-		$this->assertStringContainsString( 'Week 1', $html );
-		$this->assertStringContainsString( '80%', $html );
-		$this->assertStringContainsString( '8 คน', $html );
+		// Accessible tab structure.
+		$this->assertStringContainsString( 'role="tablist"', $html );
+		$this->assertStringContainsString( 'role="tabpanel"', $html );
 
-		// Learner segment block.
-		$this->assertStringContainsString( 'Engagement Trend ต่อผู้เรียน', $html );
-		$this->assertStringContainsString( 'High Intent but Stuck', $html );
-		$this->assertStringContainsString( 'Fast Learners / Power Learners', $html );
-		$this->assertStringContainsString( 'Low Engagement but High Score', $html );
-		$this->assertStringContainsString( 'Ada Learner', $html );
-		$this->assertStringContainsString( 'up 100%', $html );
-		$this->assertStringContainsString( 'Ben Stuck', $html );
-		$this->assertStringContainsString( 'Progress 20% / 22 events', $html );
-		$this->assertStringContainsString( 'Cara Power', $html );
-		$this->assertStringContainsString( '92.5% / 4 วัน', $html );
-		$this->assertStringContainsString( 'Dee Highscore', $html );
-		$this->assertStringContainsString( 'Engagement 23 / Quiz 90%', $html );
+		// All seven consolidated sections present as tabs + panels.
+		foreach ( array( 'insights', 'teaching', 'content', 'assessment', 'community', 'learners', 'action' ) as $section ) {
+			$this->assertStringContainsString( 'data-section="' . $section . '"', $html );
+			$this->assertStringContainsString( 'id="panel-' . $section . '"', $html );
+		}
 
-		// Content quality block.
-		$this->assertStringContainsString( 'Lesson Rewatch / Revisit Rate', $html );
-		$this->assertStringContainsString( 'Time-to-Complete per Lesson', $html );
-		$this->assertStringContainsString( 'Exit Lesson', $html );
-		$this->assertStringContainsString( 'Content Difficulty Index', $html );
-		$this->assertStringContainsString( 'Content Engagement Index', $html );
-		$this->assertStringContainsString( 'บทเรียน Seeded Revisit', $html );
-		$this->assertStringContainsString( 'Revisit 50%', $html );
-		$this->assertStringContainsString( '12.5 นาที', $html );
-		$this->assertStringContainsString( 'Exit 30%', $html );
-		$this->assertStringContainsString( 'Score 60/100', $html );
-		$this->assertStringContainsString( 'Score 75/100', $html );
+		// The initial tab is flagged for the JS controller.
+		$this->assertStringContainsString( 'data-initial="1"', $html );
 
-		// Quiz diagnostic block.
-		$this->assertStringContainsString( 'Question Difficulty', $html );
-		$this->assertStringContainsString( 'Most Common Wrong Answers', $html );
-		$this->assertStringContainsString( 'Attempts Before Pass', $html );
-		$this->assertStringContainsString( 'Quiz Retry Behavior', $html );
-		$this->assertStringContainsString( 'คำถาม Seeded', $html );
-		$this->assertStringContainsString( 'ข้อสอบ Seeded', $html );
-		$this->assertStringContainsString( 'Correct 40%', $html );
-		$this->assertStringContainsString( 'ตัวเลือกที่เข้าใจผิด', $html );
-		$this->assertStringContainsString( 'เลือกผิด 6 ครั้ง', $html );
-		$this->assertStringContainsString( 'เฉลี่ย 2.5 ครั้ง', $html );
-		$this->assertStringContainsString( 'Retry 60%', $html );
+		// Initial payload embedded for a zero-fetch first paint.
+		$this->assertStringContainsString( 'TutorLMSAnalyticsInitial', $html );
+		$this->assertStringContainsString( '"total_students":10', $html );
+
+		// Date-range picker present.
+		$this->assertStringContainsString( 'id="tla-range-form"', $html );
 	}
 
-	private function seedDashboardStats(): array {
-		return array(
-			'total_students' => 10,
-			'total_completions' => 4,
-			'course_performance' => array( array( 'completion_rate' => 40 ) ),
-			'quiz_performance' => array( 'avg_score' => 70, 'pass_rate' => 60 ),
-			'time_analytics' => array(
-				'total_learning_time' => 3600,
-				'avg_days_to_complete' => 5,
-				'time_per_content' => array(),
-				'lesson_revisit_rate' => array( array( 'lesson_id' => 501, 'title' => 'บทเรียน Seeded Revisit', 'unique_learners' => 10, 'total_views' => 15, 'revisit_rate' => 50.0 ) ),
-				'time_to_complete_per_lesson' => array( array( 'lesson_id' => 501, 'title' => 'บทเรียน Seeded Revisit', 'avg_minutes' => 12.5, 'sample_count' => 8 ) ),
-			),
-			'cohort_analytics' => array(
-				'completion_by_enrollment_cohort' => array( array( 'cohort' => '2026-01', 'enrolled' => 10, 'completed' => 4, 'completion_rate' => 40.0 ) ),
-				'retention_by_week' => array( array( 'week' => 'Week 1', 'active_learners' => 8, 'retention_rate' => 80.0 ) ),
-			),
-			'engagement' => array(
-				'at_risk_count' => 0,
-				'scores' => array(),
-				'engagement_trends' => array( array( 'user_id' => 10, 'display_name' => 'Ada Learner', 'events_7d' => 8, 'events_prev_7d' => 4, 'trend' => 'up', 'change_pct' => 100.0 ) ),
-				'high_intent_stuck' => array( array( 'user_id' => 11, 'display_name' => 'Ben Stuck', 'events_14d' => 22, 'progress_pct' => 20.0, 'last_activity' => '2026-06-30 09:00:00' ) ),
-				'power_learners' => array( array( 'user_id' => 12, 'display_name' => 'Cara Power', 'progress_pct' => 100.0, 'quiz_avg_score' => 92.5, 'days_to_complete' => 4 ) ),
-				'low_engagement_high_score' => array( array( 'user_id' => 13, 'display_name' => 'Dee Highscore', 'score' => 23, 'quiz_avg_score' => 90.0 ) ),
-			),
-			'content_gaps' => array(
-				'highest_dropoff_lessons' => array(),
-				'hardest_quizzes' => array(),
-				'lesson_quiz_correlation' => array(),
-				'exit_lessons' => array( array( 'lesson_id' => 501, 'title' => 'บทเรียน Seeded Revisit', 'exit_count' => 3, 'exit_rate' => 30.0 ) ),
-				'difficulty_index' => array( array( 'content_id' => 501, 'title' => 'บทเรียน Seeded Revisit', 'type' => 'lesson', 'score' => 60, 'signals' => array() ) ),
-				'engagement_index' => array( array( 'content_id' => 501, 'title' => 'บทเรียน Seeded Revisit', 'type' => 'lesson', 'score' => 75, 'signals' => array() ) ),
-			),
-			'quiz_diagnostics' => array(
-				'question_difficulty' => array( array( 'question_id' => 701, 'title' => 'คำถาม Seeded', 'quiz_title' => 'ข้อสอบ Seeded', 'correct_rate' => 40.0, 'attempts' => 10 ) ),
-				'common_wrong_answers' => array( array( 'question_id' => 701, 'answer' => 'ตัวเลือกที่เข้าใจผิด', 'selected_count' => 6 ) ),
-				'attempts_before_pass' => array( array( 'quiz_id' => 601, 'title' => 'ข้อสอบ Seeded', 'avg_attempts_before_pass' => 2.5, 'passed_users' => 4 ) ),
-				'retry_behavior' => array( array( 'quiz_id' => 601, 'title' => 'ข้อสอบ Seeded', 'failed_users' => 10, 'retried_users' => 6, 'retry_rate' => 60.0 ) ),
-			),
-			'alerts' => array(),
-			'survival_curve' => array( 'labels' => array(), 'data' => array() ),
-			'progress_distribution' => array(),
-			'quiz_score_distribution' => array(),
-			'pass_fail_ratio' => array(),
-			'enrollment_trend' => array( 'labels' => array(), 'data' => array() ),
-			'active_students_trend' => array( 'labels' => array(), 'data' => array() ),
-			'completion_trend' => array( 'labels' => array(), 'data' => array() ),
-			'content_insights' => array(),
-			'student_table' => array(),
-			'device_analytics' => array( 'device_distribution' => array(), 'browser_distribution' => array(), 'hourly_activity' => array() ),
-			'rating_analytics' => array(
-				'rating_distribution' => array(),
-				'nps_score' => array( 'score' => 0, 'promoters' => 0, 'passives' => 0, 'detractors' => 0, 'total' => 0 ),
-				'review_response_rate' => array( 'rate' => 0, 'reviews' => 0, 'completions' => 0 ),
-				'rating_trend' => array( 'labels' => array(), 'data' => array() ),
-			),
-		);
+	public function test_global_dashboard_shell_renders_four_sections(): void {
+		$initial_section = 'overview';
+		$initial_data    = array( 'total_students' => 5 );
+		$courses         = array();
+		$range           = \TutorLMS_Analytics\Date_Range::last_days( 30 );
+
+		ob_start();
+		require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard-global.php';
+		$html = ob_get_clean();
+
+		foreach ( array( 'overview', 'courses', 'monetization', 'community' ) as $section ) {
+			$this->assertStringContainsString( 'data-section="' . $section . '"', $html );
+		}
+		$this->assertStringContainsString( 'TutorLMSAnalyticsInitial', $html );
 	}
 }

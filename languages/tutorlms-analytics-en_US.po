@@ -1,0 +1,374 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en_US\n"
+
+msgid "TutorLMS Analytics requires Tutor LMS to be installed and activated."
+msgstr "TutorLMS Analytics requires Tutor LMS to be installed and activated."
+
+msgid "ไม่มีสิทธิ์เข้าถึง"
+msgstr "Unauthorized access"
+
+msgid "ลิงก์ส่งออกหมดอายุ กรุณาลองใหม่"
+msgstr "Export link expired, please try again"
+
+msgid "Unknown Course"
+msgstr "Unknown Course"
+
+msgid "Tutor Analytics"
+msgstr "Tutor Analytics"
+
+msgid "สถิติเชิงลึก"
+msgstr "Analytics"
+
+msgid "กำลังโหลดข้อมูล…"
+msgstr "Loading…"
+
+msgid "โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่"
+msgstr "Failed to load data, please retry"
+
+msgid "ลองใหม่"
+msgstr "Retry"
+
+msgid "ยังไม่มีข้อมูลในช่วงเวลานี้"
+msgstr "No data for this period yet"
+
+msgid "เทียบช่วงก่อนหน้า"
+msgstr "vs previous period"
+
+msgid "ข้อมูลไม่เพียงพอสำหรับการวิเคราะห์"
+msgstr "Not enough data to analyse"
+
+msgid "ถูก/ผิด"
+msgstr "ถูก/ผิด"
+
+msgid "เลือกตอบข้อเดียว"
+msgstr "เลือกตอบข้อเดียว"
+
+msgid "เลือกหลายคำตอบ"
+msgstr "เลือกหลายคำตอบ"
+
+msgid "อัตนัย"
+msgstr "อัตนัย"
+
+msgid "เติมคำในช่องว่าง"
+msgstr "เติมคำในช่องว่าง"
+
+msgid "ตอบสั้น"
+msgstr "ตอบสั้น"
+
+msgid "จับคู่"
+msgstr "จับคู่"
+
+msgid "จับคู่รูปภาพ"
+msgstr "จับคู่รูปภาพ"
+
+msgid "ตอบจากรูปภาพ"
+msgstr "ตอบจากรูปภาพ"
+
+msgid "เรียงลำดับ"
+msgstr "เรียงลำดับ"
+
+msgid "วาดบนรูปภาพ (ใหม่ 4.0)"
+msgstr "วาดบนรูปภาพ (ใหม่ 4.0)"
+
+msgid "ปักหมุดบนรูปภาพ (ใหม่ 4.0)"
+msgstr "ปักหมุดบนรูปภาพ (ใหม่ 4.0)"
+
+msgid "กราฟ/พิกัด (ใหม่ 4.0)"
+msgstr "กราฟ/พิกัด (ใหม่ 4.0)"
+
+msgid "สเกลช่วงค่า (ใหม่ 4.0)"
+msgstr "สเกลช่วงค่า (ใหม่ 4.0)"
+
+msgid "พัซเซิล (ใหม่ 4.0)"
+msgstr "พัซเซิล (ใหม่ 4.0)"
+
+msgid "ไม่ระบุเกรด"
+msgstr "ไม่ระบุเกรด"
+
+msgid "ภาพรวม"
+msgstr "Overview"
+
+msgid "ประสิทธิภาพคอร์ส"
+msgstr "Course performance"
+
+msgid "รายได้และการขาย"
+msgstr "Revenue & sales"
+
+msgid "คุณภาพและการมีส่วนร่วม"
+msgstr "Quality & engagement"
+
+msgid "ภาพรวมการเรียนรู้ของทั้งแพลตฟอร์ม"
+msgstr "Learning overview across the platform"
+
+msgid "หมวดสถิติ"
+msgstr "Analytics sections"
+
+msgid "แนวโน้มการสมัครเรียน"
+msgstr "Enrollment trend"
+
+msgid "ผู้สมัครใหม่ต่อวันในช่วงที่เลือก"
+msgstr "New enrollments per day in range"
+
+msgid "ผู้เข้าเรียน (Active)"
+msgstr "Active learners"
+
+msgid "จำนวนผู้เรียนที่มีกิจกรรมต่อวัน"
+msgstr "Active learners per day"
+
+msgid "ผู้ที่เรียนจบ"
+msgstr "Completions"
+
+msgid "จำนวนการเรียนจบต่อวัน"
+msgstr "Completions per day"
+
+msgid "สัดส่วนความนิยมของคอร์ส"
+msgstr "Course popularity"
+
+msgid "คอร์สที่มีผู้ลงทะเบียนมากที่สุด"
+msgstr "Most-enrolled courses"
+
+msgid "กิจกรรมแยกตามวัน"
+msgstr "Activity by day"
+
+msgid "วันที่ผู้เรียนมีกิจกรรมมากที่สุด"
+msgstr "Busiest days"
+
+msgid "อุปกรณ์ที่ใช้เรียน"
+msgstr "Devices"
+
+msgid "Browser"
+msgstr "Browser"
+
+msgid "ช่วงเวลาที่เข้าเรียน"
+msgstr "Active hours"
+
+msgid "Health = อัตราเรียนจบ (50) + คะแนนรีวิว (40) + มีผู้เรียน (10) — คลิกหัวคอลัมน์เพื่อจัดเรียง"
+msgstr "Health = completion (50) + rating (40) + has learners (10) — click a column to sort"
+
+msgid "ส่งออกคอร์ส (CSV)"
+msgstr "Export courses (CSV)"
+
+msgid "ส่งออกผู้เรียน"
+msgstr "Export learners"
+
+msgid "ส่งออกรายได้"
+msgstr "Export revenue"
+
+msgid "แนวโน้มรายได้สุทธิ"
+msgstr "Net revenue trend"
+
+msgid "รายได้สุทธิรายวัน (รวม native + WooCommerce)"
+msgstr "Daily net revenue (native + WooCommerce)"
+
+msgid "รายได้ตามประเภทคำสั่งซื้อ"
+msgstr "Revenue by order type"
+
+msgid "ซื้อครั้งเดียว / สมาชิก / ต่ออายุ"
+msgstr "One-time / subscription / renewal"
+
+msgid "ที่มาของการลงทะเบียน"
+msgstr "Enrollment sources"
+
+msgid "Bundle / สมาชิก / ในระบบ / ภายนอก / เพิ่มเอง"
+msgstr "Bundle / subscription / native / external / manual"
+
+msgid "สมาชิก (Subscriptions)"
+msgstr "Subscriptions"
+
+msgid "MRR เป็นค่าประมาณจากรายได้สมาชิกในช่วงที่เลือก"
+msgstr "MRR is estimated from subscription revenue in range"
+
+msgid "คูปองที่ใช้บ่อย"
+msgstr "Top coupons"
+
+msgid "Course Bundles"
+msgstr "Course bundles"
+
+msgid "ภาพรวมการมีส่วนร่วม"
+msgstr "Engagement overview"
+
+msgid "คำถามค้างตอบล่าสุด (Q&A)"
+msgstr "Recent unanswered questions (Q&A)"
+
+msgid "ตอบเพื่อลดการทิ้งคอร์ส"
+msgstr "Answer to reduce drop-off"
+
+msgid "ใบรับรองที่ออกรายเดือน"
+msgstr "Certificates issued per month"
+
+msgid "ย้อนหลัง 6 เดือน"
+msgstr "Last 6 months"
+
+msgid "ประเภทคำถามควิซ"
+msgstr "Quiz question types"
+
+msgid "สีส้ม = คำถามแบบใหม่ใน Tutor LMS 4.0"
+msgstr "Orange = new question types in Tutor LMS 4.0"
+
+msgid "การกระจายเกรด (Gradebook)"
+msgstr "Grade distribution (Gradebook)"
+
+msgid "ต้องเปิดใช้ addon Gradebook"
+msgstr "Requires the Gradebook addon"
+
+msgid "Live Lesson ที่กำลังจะมาถึง"
+msgstr "Upcoming live lessons"
+
+msgid "ภาพรวมการเรียนรู้"
+msgstr "Learning overview"
+
+msgid "ประสิทธิผลการสอน"
+msgstr "Teaching effectiveness"
+
+msgid "เนื้อหาและจุดปรับปรุง"
+msgstr "Content & gaps"
+
+msgid "การประเมินผล"
+msgstr "Assessment"
+
+msgid "การมีส่วนร่วม"
+msgstr "Engagement"
+
+msgid "ผู้เรียน"
+msgstr "Learners"
+
+msgid "ศูนย์จัดการ"
+msgstr "Action center"
+
+msgid "กลับไปหน้าภาพรวม"
+msgstr "Back to overview"
+
+msgid "สถิติรายคอร์ส"
+msgstr "Course stats"
+
+msgid "หมวดสถิติของคอร์ส"
+msgstr "Course analytics sections"
+
+msgid "กราฟการเรียนต่อ (Survival Curve)"
+msgstr "Survival curve"
+
+msgid "จุดที่กราฟตกชัน = บทเรียนที่ผู้เรียนทิ้งคอร์สมาก ควรตรวจสอบเนื้อหานั้น"
+msgstr "Steep drops = lessons where learners quit; review that content"
+
+msgid "สัดส่วนความคืบหน้า"
+msgstr "Progress distribution"
+
+msgid "การกระจายตัวของสถานะการเรียนปัจจุบัน"
+msgstr "Current progress spread"
+
+msgid "การกระจายคะแนนสอบ"
+msgstr "Quiz score distribution"
+
+msgid "ใช้วัดว่าข้อสอบยากหรือง่ายเกินไป"
+msgstr "Gauges whether the quiz is too hard/easy"
+
+msgid "สัดส่วนสอบผ่าน/ตก"
+msgstr "Pass/fail ratio"
+
+msgid "อัตราการสอบผ่านเทียบกับการเข้าสอบทั้งหมด"
+msgstr "Pass rate vs all attempts"
+
+msgid "เวลาที่ใช้ต่อบทเรียน"
+msgstr "Time per lesson"
+
+msgid "บทที่ใช้เวลานานผิดปกติอาจยากหรือยาวเกินไป"
+msgstr "Unusually long lessons may be hard or too long"
+
+msgid "กิจกรรมแยกตามชั่วโมง"
+msgstr "Activity by hour"
+
+msgid "การกระจายรีวิว"
+msgstr "Rating distribution"
+
+msgid "จำนวนรีวิวแยกตามดาว"
+msgstr "Reviews by star"
+
+msgid "แนวโน้มคะแนนรีวิว"
+msgstr "Rating trend"
+
+msgid "ค่าเฉลี่ยรายเดือน (6 เดือน)"
+msgstr "Monthly average (6 months)"
+
+msgid "ความพึงพอใจ (NPS)"
+msgstr "Satisfaction (NPS)"
+
+msgid "4-5★ = Promoter, 3★ = Passive, 1-2★ = Detractor"
+msgstr "4-5★ = Promoter, 3★ = Passive, 1-2★ = Detractor"
+
+msgid "บทเรียนที่มี Drop-off สูงสุด"
+msgstr "Highest drop-off lessons"
+
+msgid "จุดที่ผู้เรียนหยุดเรียนมากที่สุด"
+msgstr "Where learners quit most"
+
+msgid "ควิซที่ยากที่สุด"
+msgstr "Hardest quizzes"
+
+msgid "ควิซที่มี Pass Rate ต่ำที่สุด"
+msgstr "Lowest pass-rate quizzes"
+
+msgid "บทเรียนสุดท้ายก่อนหายไป (Exit)"
+msgstr "Exit lessons"
+
+msgid "บทเรียนที่เปิดซ้ำบ่อย"
+msgstr "Frequently revisited lessons"
+
+msgid "อาจเป็นเนื้อหาที่เข้าใจยาก"
+msgstr "May be hard-to-grasp content"
+
+msgid "สถิติรายบทเรียนตามโครงสร้างหลักสูตร"
+msgstr "Per-lesson stats by curriculum"
+
+msgid "ความยากรายข้อ"
+msgstr "Question difficulty"
+
+msgid "ข้อที่ตอบถูกน้อย = ยากหรือกำกวม"
+msgstr "Low correct rate = hard or ambiguous"
+
+msgid "คำตอบผิดยอดนิยม"
+msgstr "Common wrong answers"
+
+msgid "สีส้ม = คำถามแบบใหม่ใน Tutor LMS 4.0 (Draw, Pin, Coordinates, Scale, Puzzle)"
+msgstr "สีส้ม = คำถามแบบใหม่ใน Tutor LMS 4.0 (Draw, Pin, Coordinates, Scale, Puzzle)"
+
+msgid "งานที่มอบหมาย (Assignments)"
+msgstr "Assignments"
+
+msgid "ตารางความคืบหน้าของผู้เรียน"
+msgstr "Learner progress table"
+
+msgid "ค้นหา / จัดเรียงได้ทุกคอลัมน์"
+msgstr "Search / sort any column"
+
+msgid "การแจ้งเตือน"
+msgstr "Alerts"
+
+msgid "ผู้เรียนกลุ่มเสี่ยง (At-Risk)"
+msgstr "At-risk learners"
+
+msgid "Engagement ต่ำและความคืบหน้าน้อย"
+msgstr "Low engagement and progress"
+
+msgid "ช่วงเวลาสำเร็จรูป"
+msgstr "Quick ranges"
+
+msgid "7 วัน"
+msgstr "7 days"
+
+msgid "30 วัน"
+msgstr "30 days"
+
+msgid "90 วัน"
+msgstr "90 days"
+
+msgid "จาก"
+msgstr "From"
+
+msgid "ถึง"
+msgstr "To"
+
+msgid "ใช้ช่วงเวลานี้"
+msgstr "Apply range"
+

@@ -2,10 +2,13 @@
 /**
  * Plugin Name: TutorLMS Analytics
  * Plugin URI: https://example.com
- * Description: In-depth statistics and analytics dashboard for Tutor LMS.
- * Version: 1.0.7
+ * Description: In-depth statistics and analytics dashboard for Tutor LMS 4.0 (revenue, subscriptions, bundles, Q&A, certificates, assignments, live lessons, quiz-type adoption and more).
+ * Version: 2.0.0
  * Author: BIA
+ * Requires at least: 5.3
+ * Requires PHP: 7.4
  * Text Domain: tutorlms-analytics
+ * Domain Path: /languages
  *
  * @package TutorLMS_Analytics
  */
@@ -19,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'TUTORLMS_ANALYTICS_VERSION' ) ) {
-	define( 'TUTORLMS_ANALYTICS_VERSION', '1.0.7' );
+	define( 'TUTORLMS_ANALYTICS_VERSION', '2.0.0' );
 }
 if ( ! defined( 'TUTORLMS_ANALYTICS_DIR' ) ) {
 	define( 'TUTORLMS_ANALYTICS_DIR', plugin_dir_path( __FILE__ ) );
@@ -54,6 +57,8 @@ spl_autoload_register(
  * Initialize the plugin.
  */
 function init() {
+	load_plugin_textdomain( 'tutorlms-analytics', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+
 	if ( ! function_exists( 'tutor_utils' ) ) {
 		add_action( 'admin_notices', __NAMESPACE__ . '\\missing_tutor_notice' );
 		return;
@@ -62,6 +67,12 @@ function init() {
 	( new Admin_Menu() )->register();
 	( new REST_API() )->register();
 	( new Export_Handler() )->register();
+
+	// Invalidate cached stats when the underlying data changes so the dashboard
+	// stays fresh without waiting for the transient TTL.
+	foreach ( array( 'save_post_tutor_enrolled', 'tutor_after_enrolled', 'tutor_course_complete_after' ) as $hook ) {
+		add_action( $hook, array( 'TutorLMS_Analytics\\Stats_Cache', 'flush' ) );
+	}
 
 	// Enqueue tracker on frontend
 	add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\enqueue_tracker' );

@@ -203,6 +203,7 @@ if ( ! function_exists( 'current_time' ) ) {
 
 class WP_REST_Request {
 	private $json_params = array();
+	private $headers     = array();
 
 	public function set_json_params( $params ) {
 		$this->json_params = $params;
@@ -219,10 +220,23 @@ class WP_REST_Request {
 	public function set_param( $key, $value ) {
 		$this->json_params[ $key ] = $value;
 	}
+
+	public function get_param( $key ) {
+		return $this->json_params[ $key ] ?? null;
+	}
+
+	public function set_header( $key, $value ) {
+		$this->headers[ strtolower( $key ) ] = $value;
+	}
+
+	public function get_header( $key ) {
+		return $this->headers[ strtolower( $key ) ] ?? null;
+	}
 }
 
 class WP_REST_Server {
 	const CREATABLE = 'POST';
+	const READABLE  = 'GET';
 }
 
 // WPDB Mock Database specific additions
@@ -233,6 +247,139 @@ class Mock_Database {
 }
 if (!class_exists('TutorLMS_Analytics\Database')) {
 	class_alias('Mock_Database', 'TutorLMS_Analytics\Database');
+}
+
+if ( ! function_exists( 'get_post_meta' ) ) {
+	function get_post_meta( $post_id, $key = '', $single = false ) {
+		if ( isset( $GLOBALS['mock_post_meta'][ $post_id ][ $key ] ) ) {
+			return $GLOBALS['mock_post_meta'][ $post_id ][ $key ];
+		}
+		return $single ? '' : array();
+	}
+}
+
+if ( ! function_exists( 'maybe_unserialize' ) ) {
+	function maybe_unserialize( $data ) {
+		if ( is_string( $data ) && preg_match( '/^[aOs]:/', trim( $data ) ) ) {
+			$un = @unserialize( trim( $data ) );
+			if ( false !== $un ) {
+				return $un;
+			}
+		}
+		return $data;
+	}
+}
+
+if ( ! function_exists( 'get_transient' ) ) {
+	function get_transient( $key ) {
+		return $GLOBALS['mock_transients'][ $key ] ?? false;
+	}
+}
+if ( ! function_exists( 'set_transient' ) ) {
+	function set_transient( $key, $value, $ttl = 0 ) {
+		$GLOBALS['mock_transients'][ $key ] = $value;
+		return true;
+	}
+}
+if ( ! function_exists( 'get_option' ) ) {
+	function get_option( $key, $default = false ) {
+		return $GLOBALS['mock_options'][ $key ] ?? $default;
+	}
+}
+if ( ! function_exists( 'update_option' ) ) {
+	function update_option( $key, $value, $autoload = null ) {
+		$GLOBALS['mock_options'][ $key ] = $value;
+		return true;
+	}
+}
+if ( ! function_exists( 'get_gmt_from_date' ) ) {
+	function get_gmt_from_date( $date, $format = 'Y-m-d H:i:s' ) {
+		return $date; // Tests run in UTC.
+	}
+}
+if ( ! function_exists( 'esc_html_e' ) ) {
+	function esc_html_e( $text, $domain = 'default' ) {
+		echo esc_html( $text );
+	}
+}
+if ( ! function_exists( 'esc_html__' ) ) {
+	function esc_html__( $text, $domain = 'default' ) {
+		return esc_html( $text );
+	}
+}
+if ( ! function_exists( 'esc_attr_e' ) ) {
+	function esc_attr_e( $text, $domain = 'default' ) {
+		echo esc_attr( $text );
+	}
+}
+if ( ! function_exists( 'esc_attr__' ) ) {
+	function esc_attr__( $text, $domain = 'default' ) {
+		return esc_attr( $text );
+	}
+}
+if ( ! function_exists( 'esc_url_raw' ) ) {
+	function esc_url_raw( $url ) {
+		return (string) $url;
+	}
+}
+if ( ! function_exists( 'wp_nonce_url' ) ) {
+	function wp_nonce_url( $url, $action = -1 ) {
+		return $url . ( strpos( $url, '?' ) !== false ? '&' : '?' ) . '_wpnonce=test-nonce';
+	}
+}
+if ( ! function_exists( 'rest_url' ) ) {
+	function rest_url( $path = '' ) {
+		return 'http://example.org/wp-json/' . ltrim( (string) $path, '/' );
+	}
+}
+if ( ! function_exists( 'get_locale' ) ) {
+	function get_locale() {
+		return 'th';
+	}
+}
+if ( ! function_exists( 'plugin_basename' ) ) {
+	function plugin_basename( $file ) {
+		return basename( $file );
+	}
+}
+if ( ! function_exists( 'load_plugin_textdomain' ) ) {
+	function load_plugin_textdomain( $domain, $deprecated = false, $path = false ) {
+		return true;
+	}
+}
+if ( ! function_exists( 'nocache_headers' ) ) {
+	function nocache_headers() {}
+}
+if ( ! function_exists( 'wp_create_nonce' ) ) {
+	function wp_create_nonce( $action = -1 ) {
+		return 'test-nonce';
+	}
+}
+if ( ! function_exists( 'wp_verify_nonce' ) ) {
+	function wp_verify_nonce( $nonce, $action = -1 ) {
+		return 'test-nonce' === $nonce ? 1 : false;
+	}
+}
+if ( ! function_exists( 'current_user_can' ) ) {
+	function current_user_can( $cap ) {
+		return $GLOBALS['mock_user_can'][ $cap ] ?? true;
+	}
+}
+if ( ! function_exists( 'absint' ) ) {
+	function absint( $n ) {
+		return abs( (int) $n );
+	}
+}
+if ( ! function_exists( 'sanitize_key' ) ) {
+	function sanitize_key( $key ) {
+		return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $key ) );
+	}
+}
+if ( ! function_exists( 'delete_transient' ) ) {
+	function delete_transient( $key ) {
+		unset( $GLOBALS['mock_transients'][ $key ] );
+		return true;
+	}
 }
 
 // Load the main plugin file

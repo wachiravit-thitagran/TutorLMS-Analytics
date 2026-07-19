@@ -6,357 +6,144 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * @var array $stats
- * @var array $courses
+ * Store-wide analytics dashboard (shell only — the JS layer fetches and renders
+ * each section on demand). Consolidated to four tabs.
+ *
+ * @var array                          $initial_data
+ * @var string                         $initial_section
+ * @var array                          $courses
+ * @var \TutorLMS_Analytics\Date_Range $range
  */
+require_once TUTORLMS_ANALYTICS_DIR . 'views/partials/helpers.php';
+
+$tabs = array(
+	'overview'     => __( 'ภาพรวม', 'tutorlms-analytics' ),
+	'courses'      => __( 'ประสิทธิภาพคอร์ส', 'tutorlms-analytics' ),
+	'monetization' => __( 'รายได้และการขาย', 'tutorlms-analytics' ),
+	'community'    => __( 'คุณภาพและการมีส่วนร่วม', 'tutorlms-analytics' ),
+);
 ?>
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<div class="wrap" x-data="{ tab: 'overview' }">
-	<div class="flex justify-between items-center mb-6 mt-4">
+<div class="wrap tla-app">
+	<div class="tla-header">
 		<div>
-			<h1 class="wp-heading-inline !text-3xl !font-bold !m-0 text-gray-800">
-				<?php esc_html_e( 'Tutor Analytics', 'tutorlms-analytics' ); ?>
-			</h1>
-			<p class="text-sm text-gray-500 mt-1">ภาพรวมการเรียนรู้ของทั้งแพลตฟอร์ม</p>
+			<h1 class="tla-title"><?php esc_html_e( 'Tutor Analytics', 'tutorlms-analytics' ); ?></h1>
+			<p class="tla-subtitle"><?php esc_html_e( 'ภาพรวมการเรียนรู้ของทั้งแพลตฟอร์ม', 'tutorlms-analytics' ); ?></p>
 		</div>
-	</div>
-	
-	<!-- Tabs Navigation -->
-	<div class="border-b border-gray-200 mb-6 bg-white rounded-t-lg px-4 pt-4 shadow-sm">
-		<nav class="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
-			<a href="#" @click.prevent="tab = 'overview'" :class="tab === 'overview' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">ภาพรวม (Overview)</a>
-			<a href="#" @click.prevent="tab = 'courses'" :class="tab === 'courses' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">ประสิทธิภาพคอร์ส</a>
-			<a href="#" @click.prevent="tab = 'revenue'" :class="tab === 'revenue' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">รายได้ (Revenue)</a>
-			<a href="#" @click.prevent="tab = 'export'" :class="tab === 'export' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">ส่งออกข้อมูล</a>
-		</nav>
+		<?php require TUTORLMS_ANALYTICS_DIR . 'views/partials/date-range.php'; ?>
 	</div>
 
-	<!-- TAB 1: Overview -->
-	<div x-show="tab === 'overview'" x-cloak>
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
-				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">ผู้เรียนทั้งหมด</h3>
-				<p class="text-2xl font-bold text-gray-900"><i class="ti ti-users text-blue-500"></i> <?php echo number_format( $stats['total_students'] ); ?></p>
-			</div>
-			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
-				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">เรียนจบทั้งหมด</h3>
-				<p class="text-2xl font-bold text-green-600"><i class="ti ti-certificate text-green-500"></i> <?php echo number_format( $stats['total_completions'] ); ?></p>
-			</div>
-			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
-				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">คะแนนรีวิวเฉลี่ย</h3>
-				<p class="text-2xl font-bold text-gray-900"><i class="ti ti-star-filled text-yellow-500"></i> <?php echo esc_html( $stats['quiz_performance']['avg_score'] > 0 ? 'Active' : 'ไม่มีข้อมูล' ); ?></p>
-			</div>
-			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
-				<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">รายได้สุทธิ (30 วัน)</h3>
-				<p class="text-2xl font-bold text-gray-500 text-opacity-80"><i class="ti ti-report-money text-gray-400"></i> ฿<?php echo number_format( $stats['revenue']['net_revenue'] ); ?></p>
-			</div>
-		</div>
-
-		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-			<!-- Enrollment Graph -->
-			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-				<h3 class="text-lg font-semibold text-gray-800 mb-4">แนวโน้มการสมัครเรียน (30 วัน)</h3>
-				<div class="relative h-72 w-full">
-					<canvas id="enrollmentTrendChart"></canvas>
-				</div>
-			</div>
-			<!-- Active Students Graph -->
-			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-				<h3 class="text-lg font-semibold text-gray-800 mb-4">นักเรียนที่เข้าเรียน (Active 30 วัน)</h3>
-				<div class="relative h-72 w-full">
-					<canvas id="activeStudentsTrendChart"></canvas>
-				</div>
-			</div>
-			<!-- Completion Graph -->
-			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-				<h3 class="text-lg font-semibold text-gray-800 mb-4">ผู้ที่เรียนจบ (30 วัน)</h3>
-				<div class="relative h-72 w-full">
-					<canvas id="completionTrendChart"></canvas>
-				</div>
-			</div>
-		</div>
-
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-			<!-- Course Popularity Graph -->
-			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-				<h3 class="text-lg font-semibold text-gray-800 mb-4">สัดส่วนความนิยมของคอร์ส</h3>
-				<div class="relative h-72 w-full">
-					<canvas id="coursePopularityChart"></canvas>
-				</div>
-			</div>
-			<!-- Activity by Day Graph -->
-			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-				<h3 class="text-lg font-semibold text-gray-800 mb-4">Activity แยกตามวัน (90 วัน)</h3>
-				<div class="relative h-72 w-full">
-					<canvas id="activityByDayChart"></canvas>
-				</div>
-			</div>
-		</div>
-
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-				<h3 class="text-lg font-semibold text-gray-800 mb-4">สัดส่วนอุปกรณ์ที่ใช้เรียน</h3>
-				<div class="relative h-64 w-full">
-					<canvas id="globalDeviceChart"></canvas>
-				</div>
-			</div>
-			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-				<h3 class="text-lg font-semibold text-gray-800 mb-4">สัดส่วน Browser</h3>
-				<div class="relative h-64 w-full">
-					<canvas id="globalBrowserChart"></canvas>
-				</div>
-			</div>
-			<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-				<h3 class="text-lg font-semibold text-gray-800 mb-4">ช่วงเวลาที่ผู้เรียนเข้าเรียน</h3>
-				<div class="relative h-64 w-full">
-					<canvas id="globalHourlyChart"></canvas>
-				</div>
-			</div>
-		</div>
+	<div class="tla-tablist" role="tablist" aria-label="<?php esc_attr_e( 'หมวดสถิติ', 'tutorlms-analytics' ); ?>">
+		<?php foreach ( $tabs as $key => $label ) : ?>
+			<button type="button" class="tla-tab" role="tab"
+				id="tab-<?php echo esc_attr( $key ); ?>"
+				aria-controls="panel-<?php echo esc_attr( $key ); ?>"
+				aria-selected="false"
+				tabindex="-1"
+				data-section="<?php echo esc_attr( $key ); ?>"
+				<?php echo $key === $initial_section ? 'data-initial="1"' : ''; ?>>
+				<?php echo esc_html( $label ); ?>
+			</button>
+		<?php endforeach; ?>
 	</div>
 
-	<!-- TAB 2: Courses -->
-	<div x-show="tab === 'courses'" x-cloak class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-		<div class="px-6 py-4 border-b border-gray-100">
-			<h3 class="text-lg font-semibold text-gray-800">ประสิทธิภาพคอร์ส (Course Performance)</h3>
-		</div>
-		<div class="overflow-x-auto">
-			<table class="min-w-full divide-y divide-gray-200">
-				<thead class="bg-gray-50">
-					<tr>
-						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">คอร์สเรียน</th>
-						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative group cursor-help">
-							สถานะ (Health) <i class="ti ti-info-circle ml-1"></i>
-							<div class="absolute bottom-full left-0 mb-2 hidden group-hover:block w-64 p-3 bg-gray-800 text-white text-xs rounded shadow-lg z-10 whitespace-normal normal-case font-normal leading-relaxed">
-								<strong>สูตรคำนวณ Health (เต็ม 100):</strong><br>
-								• <strong>อัตราเรียนจบ (50):</strong> <code>% เรียนจบ &times; 0.5</code><br>
-								• <strong>คะแนนรีวิว (40):</strong> <code>(ดาว / 5) &times; 40</code><br>
-								• <strong>ผู้ลงทะเบียน (10):</strong> <code>มีผู้เรียนอย่างน้อย 1 คน = 10</code><br>
-								<em>คะแนนรวม = นำทั้ง 3 ส่วนมาบวกกัน</em>
-							</div>
-						</th>
-						<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้เรียน</th>
-						<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">เรียนจบ</th>
-						<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการ</th>
-					</tr>
-				</thead>
-				<tbody class="bg-white divide-y divide-gray-200">
-					<?php foreach ( $stats['course_performance'] as $cp ) : ?>
-					<tr>
-						<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo esc_html( $cp['title'] ); ?></td>
-						<td class="px-6 py-4 whitespace-nowrap">
-							<div class="w-full bg-gray-200 rounded-full h-2.5">
-								<div class="bg-<?php echo $cp['health'] > 75 ? 'green' : ($cp['health'] > 50 ? 'yellow' : 'red'); ?>-500 h-2.5 rounded-full" style="width: <?php echo esc_attr( $cp['health'] ); ?>%"></div>
-							</div>
-							<span class="text-xs text-gray-500 mt-1 block"><?php echo esc_html( $cp['health'] ); ?>/100</span>
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right"><?php echo esc_html( number_format( $cp['learners'] ) ); ?></td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right"><?php echo esc_html( $cp['completion_rate'] ); ?>%</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-right">
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=tutorlms-analytics&course_id=' . $cp['id'] ) ); ?>" class="text-blue-600 hover:text-blue-900 font-medium inline-flex items-center gap-1">
-								<i class="ti ti-chart-bar"></i> ดูข้อมูลเชิงลึก
-							</a>
-						</td>
-					</tr>
-					<?php endforeach; ?>
-				</tbody>
-			</table>
-		</div>
-	</div>
-
-	<!-- TAB 3: Export -->
-	<div x-show="tab === 'export'" x-cloak>
-		<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-			<h3 class="text-lg font-semibold text-gray-800 mb-4">ส่งออกข้อมูลสถิติ (CSV)</h3>
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-				<a href="<?php echo esc_url( admin_url( 'admin-post.php?action=tutorlms_export_revenue' ) ); ?>" class="text-center block border border-gray-200 rounded-lg p-6 hover:bg-blue-50 transition cursor-pointer">
-					<span class="block text-2xl mb-2 text-green-600"><i class="ti ti-report-money"></i></span>
-					<span class="font-medium text-gray-900 block">รายงานรายได้</span>
-					<span class="text-xs text-gray-500">ย้อนหลัง 30 วัน</span>
-				</a>
-				<a href="<?php echo esc_url( admin_url( 'admin-post.php?action=tutorlms_export_courses' ) ); ?>" class="text-center block border border-gray-200 rounded-lg p-6 hover:bg-blue-50 transition cursor-pointer">
-					<span class="block text-2xl mb-2 text-indigo-600"><i class="ti ti-books"></i></span>
-					<span class="font-medium text-gray-900 block">ประสิทธิภาพคอร์ส</span>
-					<span class="text-xs text-gray-500">คอร์สที่เปิดสอนทั้งหมด</span>
-				</a>
-				<a href="<?php echo esc_url( admin_url( 'admin-post.php?action=tutorlms_export_students' ) ); ?>" class="text-center block border border-gray-200 rounded-lg p-6 hover:bg-blue-50 transition cursor-pointer">
-					<span class="block text-2xl mb-2 text-orange-600"><i class="ti ti-school"></i></span>
-					<span class="font-medium text-gray-900 block">รายชื่อผู้เรียน</span>
-					<span class="text-xs text-gray-500">ความคืบหน้าและสถานะ</span>
-				</a>
+	<!-- Overview -->
+	<section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabindex="0"
+		data-initial="<?php echo 'overview' === $initial_section ? '1' : '0'; ?>" hidden>
+		<div data-section-body>
+			<div class="tla-grid cols-4" id="tla-kpis"></div>
+			<div class="tla-grid cols-3">
+				<?php
+				tla_chart_card( 'chart-enrollment', __( 'แนวโน้มการสมัครเรียน', 'tutorlms-analytics' ), __( 'ผู้สมัครใหม่ต่อวันในช่วงที่เลือก', 'tutorlms-analytics' ) );
+				tla_chart_card( 'chart-active', __( 'ผู้เข้าเรียน (Active)', 'tutorlms-analytics' ), __( 'จำนวนผู้เรียนที่มีกิจกรรมต่อวัน', 'tutorlms-analytics' ) );
+				tla_chart_card( 'chart-completions', __( 'ผู้ที่เรียนจบ', 'tutorlms-analytics' ), __( 'จำนวนการเรียนจบต่อวัน', 'tutorlms-analytics' ) );
+				?>
+			</div>
+			<div class="tla-grid cols-2">
+				<?php
+				tla_chart_card( 'chart-popularity', __( 'สัดส่วนความนิยมของคอร์ส', 'tutorlms-analytics' ), __( 'คอร์สที่มีผู้ลงทะเบียนมากที่สุด', 'tutorlms-analytics' ) );
+				tla_chart_card( 'chart-activity-day', __( 'กิจกรรมแยกตามวัน', 'tutorlms-analytics' ), __( 'วันที่ผู้เรียนมีกิจกรรมมากที่สุด', 'tutorlms-analytics' ) );
+				?>
+			</div>
+			<div class="tla-grid cols-3">
+				<?php
+				tla_chart_card( 'chart-device', __( 'อุปกรณ์ที่ใช้เรียน', 'tutorlms-analytics' ), '', 'sm' );
+				tla_chart_card( 'chart-browser', __( 'Browser', 'tutorlms-analytics' ), '', 'sm' );
+				tla_chart_card( 'chart-hourly', __( 'ช่วงเวลาที่เข้าเรียน', 'tutorlms-analytics' ), '', 'sm' );
+				?>
 			</div>
 		</div>
-	</div>
+	</section>
 
-	<!-- TAB 4: Revenue -->
-	<div x-show="tab === 'revenue'" x-cloak>
-		<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
-			<h3 class="text-lg font-semibold text-gray-800 mb-4">แนวโน้มรายได้ (30 วันล่าสุด)</h3>
-			<div class="relative h-80 w-full">
-				<canvas id="revenueTrendChart"></canvas>
+	<!-- Course performance -->
+	<section id="panel-courses" role="tabpanel" aria-labelledby="tab-courses" tabindex="0" hidden>
+		<div data-section-body>
+			<div class="tla-card">
+				<div class="tla-card-head">
+					<div>
+						<h3 class="tla-card-title"><?php esc_html_e( 'ประสิทธิภาพคอร์ส', 'tutorlms-analytics' ); ?></h3>
+						<p class="tla-card-desc"><?php esc_html_e( 'Health = อัตราเรียนจบ (50) + คะแนนรีวิว (40) + มีผู้เรียน (10) — คลิกหัวคอลัมน์เพื่อจัดเรียง', 'tutorlms-analytics' ); ?></p>
+					</div>
+					<div class="tla-export">
+						<a class="tla-btn" href="<?php echo esc_url( \TutorLMS_Analytics\Export_Handler::url( 'tutorlms_export_courses' ) ); ?>"><?php esc_html_e( 'ส่งออกคอร์ส (CSV)', 'tutorlms-analytics' ); ?></a>
+						<a class="tla-btn" href="<?php echo esc_url( \TutorLMS_Analytics\Export_Handler::url( 'tutorlms_export_students' ) ); ?>"><?php esc_html_e( 'ส่งออกผู้เรียน', 'tutorlms-analytics' ); ?></a>
+						<a class="tla-btn" href="<?php echo esc_url( \TutorLMS_Analytics\Export_Handler::url( 'tutorlms_export_revenue' ) ); ?>"><?php esc_html_e( 'ส่งออกรายได้', 'tutorlms-analytics' ); ?></a>
+					</div>
+				</div>
+				<div id="tla-course-table"></div>
 			</div>
 		</div>
-	</div>
+	</section>
+
+	<!-- Monetization -->
+	<section id="panel-monetization" role="tabpanel" aria-labelledby="tab-monetization" tabindex="0" hidden>
+		<div data-section-body>
+			<div class="tla-grid cols-4" id="tla-money-kpis"></div>
+			<div class="tla-grid cols-3">
+				<?php
+				tla_chart_card( 'chart-revenue-trend', __( 'แนวโน้มรายได้สุทธิ', 'tutorlms-analytics' ), __( 'รายได้สุทธิรายวัน (รวม native + WooCommerce)', 'tutorlms-analytics' ) );
+				tla_chart_card( 'chart-order-type', __( 'รายได้ตามประเภทคำสั่งซื้อ', 'tutorlms-analytics' ), __( 'ซื้อครั้งเดียว / สมาชิก / ต่ออายุ', 'tutorlms-analytics' ), 'sm' );
+				tla_chart_card( 'chart-enroll-source', __( 'ที่มาของการลงทะเบียน', 'tutorlms-analytics' ), __( 'Bundle / สมาชิก / ในระบบ / ภายนอก / เพิ่มเอง', 'tutorlms-analytics' ), 'sm' );
+				?>
+			</div>
+			<div class="tla-card">
+				<h3 class="tla-card-title"><?php esc_html_e( 'สมาชิก (Subscriptions)', 'tutorlms-analytics' ); ?></h3>
+				<p class="tla-card-desc"><?php esc_html_e( 'MRR เป็นค่าประมาณจากรายได้สมาชิกในช่วงที่เลือก', 'tutorlms-analytics' ); ?></p>
+				<div class="tla-facts" id="tla-sub-facts"></div>
+			</div>
+			<div class="tla-grid cols-2">
+				<?php
+				tla_panel_card( 'tla-coupons', __( 'คูปองที่ใช้บ่อย', 'tutorlms-analytics' ) );
+				tla_panel_card( 'tla-bundles', __( 'Course Bundles', 'tutorlms-analytics' ) );
+				?>
+			</div>
+		</div>
+	</section>
+
+	<!-- Community & quality -->
+	<section id="panel-community" role="tabpanel" aria-labelledby="tab-community" tabindex="0" hidden>
+		<div data-section-body>
+			<div class="tla-card">
+				<h3 class="tla-card-title"><?php esc_html_e( 'ภาพรวมการมีส่วนร่วม', 'tutorlms-analytics' ); ?></h3>
+				<div class="tla-facts" id="tla-community-facts"></div>
+			</div>
+			<div class="tla-grid cols-2">
+				<?php
+				tla_panel_card( 'tla-qna-unanswered', __( 'คำถามค้างตอบล่าสุด (Q&A)', 'tutorlms-analytics' ), __( 'ตอบเพื่อลดการทิ้งคอร์ส', 'tutorlms-analytics' ) );
+				tla_chart_card( 'chart-cert-trend', __( 'ใบรับรองที่ออกรายเดือน', 'tutorlms-analytics' ), __( 'ย้อนหลัง 6 เดือน', 'tutorlms-analytics' ) );
+				?>
+			</div>
+			<div class="tla-grid cols-2">
+				<div class="tla-card">
+					<h3 class="tla-card-title"><?php esc_html_e( 'ประเภทคำถามควิซ', 'tutorlms-analytics' ); ?></h3>
+					<p class="tla-card-desc"><?php esc_html_e( 'สีส้ม = คำถามแบบใหม่ใน Tutor LMS 4.0', 'tutorlms-analytics' ); ?></p>
+					<div class="tla-chart" id="chart-quiz-types-comm"></div>
+					<p class="tla-note" id="tla-v4-adoption-comm"></p>
+				</div>
+				<?php tla_chart_card( 'chart-gradebook-comm', __( 'การกระจายเกรด (Gradebook)', 'tutorlms-analytics' ), __( 'ต้องเปิดใช้ addon Gradebook', 'tutorlms-analytics' ) ); ?>
+			</div>
+			<?php tla_panel_card( 'tla-live-upcoming', __( 'Live Lesson ที่กำลังจะมาถึง', 'tutorlms-analytics' ) ); ?>
+		</div>
+	</section>
+
+	<?php require TUTORLMS_ANALYTICS_DIR . 'views/partials/initial-data.php'; ?>
 </div>
-
-<style>[x-cloak] { display: none !important; }</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-	// Enrollment Chart
-	const enrData = <?php echo wp_json_encode( $stats['enrollment_trend'] ?? array('labels'=>[], 'data'=>[]) ); ?>;
-	if(document.getElementById('enrollmentTrendChart') && enrData.labels) {
-		new Chart(document.getElementById('enrollmentTrendChart').getContext('2d'), {
-			type: 'line',
-			data: {
-				labels: enrData.labels,
-				datasets: [{
-					label: 'ผู้สมัครเรียนใหม่',
-					data: enrData.data,
-					borderColor: 'rgb(59, 130, 246)',
-					backgroundColor: 'rgba(59, 130, 246, 0.1)',
-					borderWidth: 2, fill: true, tension: 0.3
-				}]
-			},
-			options: { responsive: true, maintainAspectRatio: false }
-		});
-	}
-
-	// Active Students Chart
-	const actData = <?php echo wp_json_encode( $stats['active_students_trend'] ?? array('labels'=>[], 'data'=>[]) ); ?>;
-	if(document.getElementById('activeStudentsTrendChart') && actData.labels) {
-		new Chart(document.getElementById('activeStudentsTrendChart').getContext('2d'), {
-			type: 'line',
-			data: {
-				labels: actData.labels,
-				datasets: [{
-					label: 'ผู้เข้าเรียน (Active)',
-					data: actData.data,
-					borderColor: 'rgb(245, 158, 11)',
-					backgroundColor: 'rgba(245, 158, 11, 0.1)',
-					borderWidth: 2, fill: true, tension: 0.3
-				}]
-			},
-			options: { responsive: true, maintainAspectRatio: false }
-		});
-	}
-
-	// Completion Chart
-	const compData = <?php echo wp_json_encode( $stats['completion_trend'] ?? array('labels'=>[], 'data'=>[]) ); ?>;
-	if(document.getElementById('completionTrendChart') && compData.labels) {
-		new Chart(document.getElementById('completionTrendChart').getContext('2d'), {
-			type: 'bar',
-			data: {
-				labels: compData.labels,
-				datasets: [{
-					label: 'ผู้ที่เรียนจบ',
-					data: compData.data,
-					backgroundColor: 'rgba(16, 185, 129, 0.8)',
-				}]
-			},
-			options: { responsive: true, maintainAspectRatio: false }
-		});
-	}
-
-	// Course Popularity Chart
-	const popData = <?php echo wp_json_encode( $stats['course_popularity'] ?? [] ); ?>;
-	if(document.getElementById('coursePopularityChart') && Object.keys(popData).length > 0) {
-		new Chart(document.getElementById('coursePopularityChart').getContext('2d'), {
-			type: 'doughnut',
-			data: {
-				labels: Object.keys(popData),
-				datasets: [{
-					data: Object.values(popData),
-					backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6b7280'],
-				}]
-			},
-			options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
-		});
-	}
-
-	// Activity by Day Chart
-	const actDayData = <?php echo wp_json_encode( $stats['activity_by_day'] ?? [] ); ?>;
-	if(document.getElementById('activityByDayChart') && Object.keys(actDayData).length > 0) {
-		new Chart(document.getElementById('activityByDayChart').getContext('2d'), {
-			type: 'bar',
-			data: {
-				labels: Object.keys(actDayData),
-				datasets: [{
-					label: 'Activity',
-					data: Object.values(actDayData),
-					backgroundColor: 'rgba(139, 92, 246, 0.8)',
-				}]
-			},
-			options: { responsive: true, maintainAspectRatio: false }
-		});
-	}
-
-	// Revenue Trend Chart
-	const revData = <?php echo wp_json_encode( $stats['revenue']['trend'] ?? array('labels'=>[], 'data'=>[]) ); ?>;
-	if(document.getElementById('revenueTrendChart') && revData.labels && revData.labels.length > 0) {
-		new Chart(document.getElementById('revenueTrendChart').getContext('2d'), {
-			type: 'line',
-			data: {
-				labels: revData.labels,
-				datasets: [{
-					label: 'รายได้ (THB)',
-					data: revData.data,
-					borderColor: 'rgb(16, 185, 129)',
-					backgroundColor: 'rgba(16, 185, 129, 0.1)',
-					borderWidth: 2, fill: true, tension: 0.3
-				}]
-			},
-			options: { responsive: true, maintainAspectRatio: false }
-		});
-	}
-
-	// Global Device Distribution
-	const gDeviceData = <?php echo wp_json_encode( $stats['device_analytics']['device_distribution'] ?? [] ); ?>;
-	if(document.getElementById('globalDeviceChart') && Object.keys(gDeviceData).length > 0) {
-		new Chart(document.getElementById('globalDeviceChart').getContext('2d'), {
-			type: 'doughnut',
-			data: {
-				labels: Object.keys(gDeviceData),
-				datasets: [{ data: Object.values(gDeviceData), backgroundColor: ['#3b82f6', '#f59e0b', '#10b981'] }]
-			},
-			options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-		});
-	}
-
-	// Global Browser Distribution
-	const gBrowserData = <?php echo wp_json_encode( $stats['device_analytics']['browser_distribution'] ?? [] ); ?>;
-	if(document.getElementById('globalBrowserChart') && Object.keys(gBrowserData).length > 0) {
-		new Chart(document.getElementById('globalBrowserChart').getContext('2d'), {
-			type: 'doughnut',
-			data: {
-				labels: Object.keys(gBrowserData),
-				datasets: [{ data: Object.values(gBrowserData), backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#6b7280'] }]
-			},
-			options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-		});
-	}
-
-	// Global Hourly Activity
-	const gHourlyData = <?php echo wp_json_encode( $stats['device_analytics']['hourly_activity'] ?? [] ); ?>;
-	if(document.getElementById('globalHourlyChart') && Object.keys(gHourlyData).length > 0) {
-		const gHrs = Object.keys(gHourlyData);
-		const gCts = Object.values(gHourlyData);
-		const gMax = Math.max(...gCts);
-		new Chart(document.getElementById('globalHourlyChart').getContext('2d'), {
-			type: 'bar',
-			data: {
-				labels: gHrs,
-				datasets: [{
-					label: 'Activity',
-					data: gCts,
-					backgroundColor: gCts.map(c => { const i = gMax > 0 ? c / gMax : 0; return `rgba(139, 92, 246, ${0.2 + i * 0.8})`; }),
-					borderRadius: 2,
-				}]
-			},
-			options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-		});
-	}
-});
-</script>

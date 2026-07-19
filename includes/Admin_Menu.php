@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace TutorLMS_Analytics;
 
 class Admin_Menu {
+
+	public const HOOK_SUFFIX = 'tutor-lms_page_tutorlms-analytics';
+
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'add_menu_page' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
@@ -21,65 +24,91 @@ class Admin_Menu {
 	}
 
 	public function enqueue_assets( $hook ): void {
-		if ( 'tutor-lms_page_tutorlms-analytics' !== $hook ) {
+		if ( self::HOOK_SUFFIX !== $hook ) {
 			return;
 		}
 
-		// Enqueue Chart.js, Tailwind, and Tabler Icons via CDN for rapid admin UI.
-		wp_enqueue_script( 'chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', array(), '4.4.0', true );
-		wp_enqueue_script( 'tailwindcss', 'https://cdn.tailwindcss.com', array(), '3.4.0', false );
-		wp_enqueue_style( 'tabler-icons', 'https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css', array(), 'latest' );
+		$dist = TUTORLMS_ANALYTICS_DIR . 'assets/dist/';
+		$url  = TUTORLMS_ANALYTICS_URL . 'assets/dist/';
+
+		// Vendored libraries (pinned versions, no CDN dependency).
+		$chart_path = $dist . 'chart.umd.min.js';
+		wp_enqueue_script(
+			'tutorlms-analytics-chartjs',
+			$url . 'chart.umd.min.js',
+			array(),
+			file_exists( $chart_path ) ? (string) filemtime( $chart_path ) : '4.4.9',
+			true
+		);
+
+		$css_path = $dist . 'dashboard.css';
+		wp_enqueue_style(
+			'tutorlms-analytics-dashboard',
+			$url . 'dashboard.css',
+			array(),
+			file_exists( $css_path ) ? (string) filemtime( $css_path ) : TUTORLMS_ANALYTICS_VERSION
+		);
+
+		$app_path = $dist . 'dashboard.js';
+		wp_enqueue_script(
+			'tutorlms-analytics-dashboard',
+			$url . 'dashboard.js',
+			array( 'tutorlms-analytics-chartjs' ),
+			file_exists( $app_path ) ? (string) filemtime( $app_path ) : TUTORLMS_ANALYTICS_VERSION,
+			true
+		);
+
+		$course_id = isset( $_GET['course_id'] ) ? absint( $_GET['course_id'] ) : 0;
+		wp_localize_script(
+			'tutorlms-analytics-dashboard',
+			'TutorLMSAnalyticsConfig',
+			array(
+				'restUrl'   => esc_url_raw( rest_url( 'tutor-analytics/v1/section' ) ),
+				'nonce'     => wp_create_nonce( 'wp_rest' ),
+				'courseId'  => $course_id,
+				'locale'    => get_locale(),
+				'i18n'      => $this->js_strings(),
+			)
+		);
+	}
+
+	/**
+	 * Strings the JS layer renders (charts/empty states) — wrapped for i18n.
+	 *
+	 * @return array<string,string>
+	 */
+	private function js_strings(): array {
+		return array(
+			'loading'        => __( 'กำลังโหลดข้อมูล…', 'tutorlms-analytics' ),
+			'error'          => __( 'โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่', 'tutorlms-analytics' ),
+			'retry'          => __( 'ลองใหม่', 'tutorlms-analytics' ),
+			'noData'         => __( 'ยังไม่มีข้อมูลในช่วงเวลานี้', 'tutorlms-analytics' ),
+			'vsPrevious'     => __( 'เทียบช่วงก่อนหน้า', 'tutorlms-analytics' ),
+			'notEnoughData'  => __( 'ข้อมูลไม่เพียงพอสำหรับการวิเคราะห์', 'tutorlms-analytics' ),
+		);
 	}
 
 	public function render_page(): void {
-		$course_id         = isset( $_GET['course_id'] ) ? (int) $_GET['course_id'] : 0;
-		$provider          = new Data_Provider();
-		$revenue_provider  = new Providers\Revenue_Provider();
-		$course_perf_prov  = new Providers\Course_Performance_Provider();
-		$student_provider  = new Providers\Student_Provider();
-		$alerts_provider   = new Providers\Alerts_Provider();
+		$course_id = isset( $_GET['course_id'] ) ? absint( $_GET['course_id'] ) : 0;
 
-		// Legacy providers for specific tabs
-		$funnel_provider   = new Providers\Funnel_Provider();
-		$survival_provider = new Providers\Survival_Provider();
-		$quiz_provider     = new Providers\Quiz_Provider();
+		// Active date range from the picker (defaults to last 30 days).
+		$from  = isset( $_GET['from'] ) ? sanitize_text_field( wp_unslash( $_GET['from'] ) ) : null;
+		$to    = isset( $_GET['to'] ) ? sanitize_text_field( wp_unslash( $_GET['to'] ) ) : null;
+		$range = Date_Range::from_request( $from, $to );
 
-		// New analytics providers
-		$time_provider       = new Providers\Time_Analytics_Provider();
-		$device_provider     = new Providers\Device_Analytics_Provider();
-		$content_gap_prov    = new Providers\Content_Gap_Provider();
-		$rating_prov         = new Providers\Rating_Analytics_Provider();
-		$engagement_prov     = new Providers\Engagement_Provider();
-		$cohort_provider     = new Providers\Cohort_Provider();
-
-		$courses = $provider->get_all_courses();
-		$stats   = $provider->get_all_stats( $course_id );
-
-		// New BI Data
-		$stats['revenue']            = $revenue_provider->get_revenue_stats( $course_id );
-		$stats['course_performance'] = $course_perf_prov->get_course_table( $course_id );
-		$stats['student_table']      = $student_provider->get_student_table( $course_id );
-		$stats['alerts']             = $alerts_provider->get_alerts( $course_id );
-
-		// Retained Advanced Data
-		$stats['progress_distribution'] = $funnel_provider->get_progress_distribution( $course_id );
-		$stats['quiz_performance']      = $quiz_provider->get_quiz_performance( $course_id );
-
-		// New Analytics Data
-		$stats['time_analytics']     = $time_provider->get_time_analytics( $course_id );
-		$stats['device_analytics']   = $device_provider->get_device_analytics( $course_id );
-		$stats['rating_analytics']   = $rating_prov->get_rating_analytics( $course_id );
-		$stats['engagement']         = $engagement_prov->get_engagement_data( $course_id );
-		$stats['cohort_analytics']   = $cohort_provider->get_cohort_analytics( $course_id );
+		$service = new Analytics_Service();
+		$courses = ( new Data_Provider() )->get_all_courses();
 
 		if ( $course_id > 0 ) {
-			$stats['survival_curve']          = $survival_provider->get_survival_curve( $course_id );
-			$stats['quiz_score_distribution'] = $quiz_provider->get_quiz_score_distribution( $course_id );
-			$stats['pass_fail_ratio']         = $quiz_provider->get_pass_fail_ratio( $course_id );
-			$stats['content_gaps']            = $content_gap_prov->get_content_gaps( $course_id );
-			$stats['quiz_diagnostics']        = $quiz_provider->get_quiz_diagnostics( $course_id );
+			$initial_section = 'insights';
+			$sections        = Analytics_Service::COURSE_SECTIONS;
+			$initial_data    = $service->get_section( $initial_section, $course_id, $range );
+			$course_title    = get_the_title( $course_id );
 			require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard-single.php';
 		} else {
+			$initial_section = 'overview';
+			$sections        = Analytics_Service::GLOBAL_SECTIONS;
+			$initial_data    = $service->get_section( $initial_section, $course_id, $range );
 			require TUTORLMS_ANALYTICS_DIR . 'views/admin-dashboard-global.php';
 		}
 	}
