@@ -177,6 +177,11 @@ $tabs = array(
 	<section id="panel-learners" role="tabpanel" aria-labelledby="tab-learners" tabindex="0" hidden>
 		<div data-section-body>
 			<div class="tla-card">
+				<h3 class="tla-card-title"><?php esc_html_e( 'สถานะปัจจุบันของผู้เรียนรายบทเรียน', 'tutorlms-analytics' ); ?></h3>
+				<p class="tla-card-desc"><?php esc_html_e( 'จุดสี = บทเรียนที่เรียนจบแล้ว วงแหวนเรืองแสง = บทเรียนล่าสุด', 'tutorlms-analytics' ); ?></p>
+				<div id="tla-lesson-matrix"></div>
+			</div>
+			<div class="tla-card">
 				<h3 class="tla-card-title"><?php esc_html_e( 'ตารางความคืบหน้าของผู้เรียน', 'tutorlms-analytics' ); ?></h3>
 				<p class="tla-card-desc"><?php esc_html_e( 'ค้นหา / จัดเรียงได้ทุกคอลัมน์', 'tutorlms-analytics' ); ?></p>
 				<div id="tla-learner-table"></div>

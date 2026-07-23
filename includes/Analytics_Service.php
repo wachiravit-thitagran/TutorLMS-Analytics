@@ -189,10 +189,12 @@ class Analytics_Service {
 	private function learners_section( int $course_id ): array {
 		$student    = new Providers\Student_Provider();
 		$engagement = new Providers\Engagement_Provider();
+		$matrix     = new Providers\Lesson_Matrix_Provider();
 
 		return array(
 			'student_table' => $student->get_student_table( $course_id ),
 			'engagement'    => $engagement->get_engagement_data( $course_id ),
+			'lesson_matrix' => $matrix->get_lesson_matrix( $course_id ),
 		);
 	}
 

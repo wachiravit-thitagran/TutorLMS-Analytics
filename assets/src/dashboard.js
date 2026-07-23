@@ -497,6 +497,7 @@
 	};
 
 	renderers.learners = function ( d ) {
+		renderLessonMatrix( 'tla-lesson-matrix', d.lesson_matrix || {} );
 		var rows = d.student_table || [];
 		var scores = ( d.engagement && d.engagement.scores ) || [];
 		var scoreMap = {};
@@ -576,6 +577,66 @@
 			] );
 		} ) );
 		host.appendChild( ul );
+	}
+
+	// Per-student lesson progress matrix (dot timeline).
+	function renderLessonMatrix( id, data ) {
+		var host = document.getElementById( id );
+		if ( ! host ) { return; }
+		clear( host );
+
+		var lessons  = data.lessons || [];
+		var students = data.students || [];
+		var summary  = data.summary || {};
+		if ( ! lessons.length || ! students.length ) {
+			host.appendChild( emptyState( 'ยังไม่มีข้อมูลความคืบหน้าของผู้เรียน' ) );
+			return;
+		}
+
+		// Summary facts.
+		var facts = el( 'div', { class: 'tla-facts' }, [
+			factItem( 'ผู้เรียนทั้งหมด', fmtInt( summary.total_students ) ),
+			factItem( 'ความคืบหน้าเฉลี่ย', fmtPct( summary.avg_percent ) ),
+			factItem( 'เรียนจบครบ', fmtInt( summary.completed_all ) ),
+			factItem( 'กำลังเรียน', fmtInt( summary.in_progress ) ),
+			factItem( 'ยังไม่เริ่ม', fmtInt( summary.not_started ) )
+		] );
+		host.appendChild( facts );
+
+		var palette = [ C.blue, C.green, C.purple, C.orange, '#2A9D8F', '#E76F51' ];
+		var orderMap = {};
+		lessons.forEach( function ( l, i ) { orderMap[ l.id ] = i; } );
+
+		// Header row.
+		var headCells = [ el( 'div', { class: 'tla-lm-name tla-lm-head', text: 'ผู้เรียน' } ) ];
+		lessons.forEach( function ( l, i ) {
+			headCells.push( el( 'div', { class: 'tla-lm-cell tla-lm-head', title: l.title, text: 'บทที่ ' + ( i + 1 ) } ) );
+		} );
+		var grid = el( 'div', { class: 'tla-lm-grid', style: '--lm-cols:' + lessons.length, role: 'table' }, [
+			el( 'div', { class: 'tla-lm-row', role: 'row' }, headCells )
+		] );
+
+		students.forEach( function ( s, si ) {
+			var color = palette[ si % palette.length ];
+			var done = {};
+			( s.completed || [] ).forEach( function ( lid ) { done[ lid ] = true; } );
+			var currentPos = s.current_lesson_id && orderMap[ s.current_lesson_id ] != null ? orderMap[ s.current_lesson_id ] : -1;
+
+			var cells = [ el( 'div', { class: 'tla-lm-name', title: s.percent + '%', text: s.display_name } ) ];
+			lessons.forEach( function ( l, i ) {
+				var cls = 'tla-lm-cell';
+				cls += done[ l.id ] ? ' is-done' : ' is-todo';
+				if ( i === currentPos ) { cls += ' is-current'; }
+				if ( i <= currentPos ) { cls += ' in-track'; }
+				if ( i === 0 ) { cls += ' is-first'; }
+				if ( i === lessons.length - 1 ) { cls += ' is-last'; }
+				var tip = s.display_name + ' · ' + l.title + ( done[ l.id ] ? ' ✓' : '' );
+				cells.push( el( 'div', { class: cls, title: tip }, [ el( 'span', { class: 'tla-lm-dot' } ) ] ) );
+			} );
+			grid.appendChild( el( 'div', { class: 'tla-lm-row', role: 'row', style: '--lmc:' + color }, cells ) );
+		} );
+
+		host.appendChild( el( 'div', { class: 'tla-lm-scroll' }, [ grid ] ) );
 	}
 
 	function renderCurriculum( id, topics ) {

@@ -141,6 +141,30 @@
 .tla-alert p { margin: 0; color: var(--tla-muted); font-size: 0.86rem; }
 .tla-ok { background: #e3f4ee; color: var(--tla-green); border-radius: var(--tla-radius); padding: 16px; font-weight: 500; }
 
+/* ---- lesson progress matrix (dot timeline) ---- */
+.tla-lm-scroll { overflow-x: auto; margin-top: 14px; }
+.tla-lm-grid { min-width: 100%; display: inline-block; }
+.tla-lm-row { display: grid; grid-template-columns: 140px repeat(var(--lm-cols), minmax(72px, 1fr)); align-items: center; }
+.tla-lm-row:not(:first-child):hover { background: rgba(0, 114, 178, 0.04); }
+.tla-lm-name { padding: 14px 12px 14px 4px; font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-right: 1px solid var(--tla-border); }
+.tla-lm-head { font-weight: 600; font-size: 0.82rem; color: var(--tla-muted); text-align: center; padding: 8px 4px; border-bottom: 1px solid var(--tla-border); }
+.tla-lm-head.tla-lm-name { text-align: left; }
+.tla-lm-cell { position: relative; display: flex; align-items: center; justify-content: center; padding: 14px 0; }
+/* connector line through each cell */
+.tla-lm-cell:not(.tla-lm-head)::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px dashed var(--tla-border); }
+.tla-lm-cell.in-track:not(.is-current)::before,
+.tla-lm-cell.is-current::before { border-top: 3px solid var(--lmc); }
+.tla-lm-cell.is-current::after { content: ""; position: absolute; left: 50%; right: 0; top: 50%; border-top: 2px dashed var(--tla-border); }
+.tla-lm-cell.is-first::before { left: 50%; }
+.tla-lm-cell.is-last::before, .tla-lm-cell.is-last.is-current::after { right: 50%; }
+/* dots */
+.tla-lm-dot { position: relative; z-index: 1; width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2px solid var(--tla-border); box-sizing: border-box; }
+.tla-lm-cell.is-done .tla-lm-dot { background: var(--lmc); border-color: var(--lmc); }
+.tla-lm-cell.is-current .tla-lm-dot { width: 20px; height: 20px; border: 3px solid #fff; background: var(--lmc); box-shadow: 0 0 0 3px var(--lmc); }
+@supports (color: color-mix(in srgb, red 50%, transparent)) {
+	.tla-lm-cell.is-current .tla-lm-dot { box-shadow: 0 0 0 3px var(--lmc), 0 0 10px 4px color-mix(in srgb, var(--lmc) 45%, transparent); }
+}
+
 /* ---- states ---- */
 .tla-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 32px 16px; color: var(--tla-muted); text-align: center; height: 100%; min-height: 160px; }
 .tla-empty-icon { font-size: 1.8rem; opacity: 0.5; }
