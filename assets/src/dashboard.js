@@ -480,10 +480,22 @@
 			var title = r.question_title ? r.question_title + ' — ' + ( r.answer || '' ) : ( r.answer || r.title );
 			return { title: title, meta: 'เลือกผิด ' + r.selected_count + ' ครั้ง' };
 		}, 'ไม่มีข้อมูล' );
-		var types = qt.types || [];
-		draw( 'chart-quiz-types', types.length > 0, function () {
-			return barSeries( 'จำนวนคำถาม', types.map( function ( r ) { return r.label; } ), types.map( function ( r ) { return r.questions; } ),
-				types.map( function ( r ) { return r.is_new_v4 ? C.orange : C.blue; } ) );
+		var qrows = qd.question_difficulty || [];
+		draw( 'chart-quiz-types', qrows.length > 0, function () {
+			return {
+				type: 'bar',
+				data: {
+					labels: qrows.map( function ( r, i ) { return r.title || ( 'ข้อ ' + ( i + 1 ) ); } ),
+					datasets: [
+						{ label: 'ตอบถูก', data: qrows.map( function ( r ) { return r.correct_count; } ), backgroundColor: C.green, borderRadius: 4 },
+						{ label: 'ตอบผิด', data: qrows.map( function ( r ) { return r.wrong_count; } ), backgroundColor: C.red, borderRadius: 4 }
+					]
+				},
+				options: baseOptions( {
+					scales: { x: { stacked: true }, y: { stacked: true, ticks: { precision: 0 } } },
+					plugins: { legend: { position: 'top' } }
+				} )
+			};
 		} );
 		infoRow( 'tla-assign-facts', a.available ? [
 			factItem( 'งานทั้งหมด', fmtInt( a.total_assignments ) ),

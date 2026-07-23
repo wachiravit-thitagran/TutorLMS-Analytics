@@ -139,11 +139,13 @@ class Quiz_Provider {
 			$attempts = (int) $row['attempts'];
 			$correct = (int) $row['correct_count'];
 			$data[] = array(
-				'question_id'  => (int) $row['question_id'],
-				'title'        => get_the_title( (int) $row['question_id'] ),
-				'quiz_title'   => get_the_title( (int) $row['quiz_id'] ),
-				'correct_rate' => $attempts > 0 ? round( ( $correct / $attempts ) * 100, 1 ) : 0.0,
-				'attempts'     => $attempts,
+				'question_id'   => (int) $row['question_id'],
+				'title'         => get_the_title( (int) $row['question_id'] ),
+				'quiz_title'    => get_the_title( (int) $row['quiz_id'] ),
+				'correct_rate'  => $attempts > 0 ? round( ( $correct / $attempts ) * 100, 1 ) : 0.0,
+				'attempts'      => $attempts,
+				'correct_count' => $correct,
+				'wrong_count'   => $attempts - $correct,
 			);
 		}
 

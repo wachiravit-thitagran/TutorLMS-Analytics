@@ -136,8 +136,8 @@ $tabs = array(
 				?>
 			</div>
 			<div class="tla-card">
-				<h3 class="tla-card-title"><?php esc_html_e( 'ประเภทคำถามควิซ', 'tutorlms-analytics' ); ?></h3>
-				<p class="tla-card-desc"><?php esc_html_e( 'สีส้ม = คำถามแบบใหม่ใน Tutor LMS 4.0 (Draw, Pin, Coordinates, Scale, Puzzle)', 'tutorlms-analytics' ); ?></p>
+				<h3 class="tla-card-title"><?php esc_html_e( 'ผลการตอบรายข้อ (ถูก/ผิด)', 'tutorlms-analytics' ); ?></h3>
+				<p class="tla-card-desc"><?php esc_html_e( 'แท่งละข้อ สีเขียว = ตอบถูก สีแดง = ตอบผิด', 'tutorlms-analytics' ); ?></p>
 				<div class="tla-chart" id="chart-quiz-types"></div>
 			</div>
 			<div class="tla-card">
