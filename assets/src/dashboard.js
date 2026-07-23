@@ -498,6 +498,17 @@
 
 	renderers.learners = function ( d ) {
 		renderLessonMatrix( 'tla-lesson-matrix', d.lesson_matrix || {} );
+		var cohort = ( d.cohort && d.cohort.completion_by_enrollment_cohort ) || [];
+		draw( 'chart-cohort', cohort.length > 0, function () {
+			return barSeries( 'อัตราเรียนจบ (%)', cohort.map( function ( r ) { return r.cohort; } ), cohort.map( function ( r ) { return r.completion_rate; } ), C.blue );
+		} );
+		var retention = ( d.cohort && d.cohort.retention_by_week ) || [];
+		draw( 'chart-retention', retention.length > 0, function () {
+			return lineSeries( 'Retention (%)', {
+				labels: retention.map( function ( r ) { return r.week; } ),
+				data: retention.map( function ( r ) { return r.retention_rate; } )
+			}, C.green );
+		} );
 		var rows = d.student_table || [];
 		var scores = ( d.engagement && d.engagement.scores ) || [];
 		var scoreMap = {};

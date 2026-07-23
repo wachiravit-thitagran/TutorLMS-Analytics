@@ -106,7 +106,7 @@ $menu->render_page();
 $output_empty = ob_get_clean();
 
 tla_assert_contains( $output_empty, 'Tutor Analytics', "Global dashboard renders without fatal error." );
-tla_assert_contains( $output_empty, 'ผู้เรียนทั้งหมด', "Global dashboard contains general summary metrics." );
+tla_assert_contains( $output_empty, 'แนวโน้มการสมัครเรียน', "Global dashboard contains the enrollment trend card." );
 // Note: Depending on UI, it might just render '0' or specific empty messages.
 tla_assert_contains( $output_empty, '0', "Empty state renders zero values correctly." );
 
@@ -303,8 +303,8 @@ $menu->render_page();
 $output_global = ob_get_clean();
 
 // Removed brittle checks for specific seeded course titles in the global view
-tla_assert_contains( $output_global, 'globalDeviceChart', "Global dashboard renders device chart ID." );
-tla_assert_contains( $output_global, 'globalHourlyChart', "Global dashboard renders hourly chart ID." );
+tla_assert_contains( $output_global, 'chart-device', "Global dashboard renders device chart ID." );
+tla_assert_contains( $output_global, 'chart-hourly', "Global dashboard renders hourly chart ID." );
 
 
 // -----------------------------------------------------------------------------
@@ -350,13 +350,30 @@ wp_insert_comment(array(
 	'comment_approved' => '1',
 ));
 
+// The dashboard is a JS-driven shell, so verify the shell renders and assert
+// the drop-off numbers through the data layer (served to JS via REST).
 $_GET['course_id'] = $course_dropoff;
 ob_start();
 $menu->render_page();
 $output_dropoff = ob_get_clean();
 unset( $_GET['course_id'] );
 
-tla_assert_contains( $output_dropoff, '-50%', "Drop-off calculates correctly with comment_approved = '1'." );
-tla_assert_contains( $output_dropoff, 'หายไป 1 คน', "Drop-off count correctly identifies 1 missing person." );
+tla_assert_contains( $output_dropoff, 'Dropoff Test Course', "Course dashboard shell renders for drop-off course." );
+
+\TutorLMS_Analytics\Stats_Cache::flush();
+$service = new \TutorLMS_Analytics\Analytics_Service();
+$range   = \TutorLMS_Analytics\Date_Range::last_days( 30 );
+$content = $service->get_section( 'content', (int) $course_dropoff, $range );
+$dropoff_lessons = $content['content_gaps']['highest_dropoff_lessons'] ?? array();
+
+tla_assert( ! empty( $dropoff_lessons ), "Drop-off data exists with comment_approved = '1'." );
+$found_drop = false;
+foreach ( $dropoff_lessons as $row ) {
+	if ( abs( (float) $row['drop_pct'] - 50.0 ) < 0.1 && 1 === (int) $row['drop_count'] ) {
+		$found_drop = true;
+		break;
+	}
+}
+tla_assert( $found_drop, "Drop-off calculates 50% / 1 person with comment_approved = '1'." );
 
 echo "\n🎉 All comprehensive integration tests passed successfully!\n";

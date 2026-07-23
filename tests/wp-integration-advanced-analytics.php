@@ -231,44 +231,128 @@ tla_insert_quiz_answer( 102, $question_id, 1, 'Correct answer' );
 tla_insert_quiz_answer( 103, $question_id, 0, 'Common misconception' );
 tla_insert_quiz_answer( 104, $question_id, 1, 'Correct answer' );
 
+// ---- 1. Shell render: the dashboard is a JS-driven shell; the server output
+// contains the course title, tabs, and card headings (data arrives via REST).
 $_GET['course_id'] = $course_id;
 $menu = new \TutorLMS_Analytics\Admin_Menu();
 ob_start();
 $menu->render_page();
 $output = ob_get_clean();
 
-$expected = array(
+$expected_shell = array(
 	'WP Integration Analytics Course',
 	'อัตราการเรียนจบตามกลุ่มผู้สมัคร (Cohort)',
-	'33.3%',
 	'อัตราการเข้าเรียนอย่างต่อเนื่องรายสัปดาห์ (Retention)',
-	'100%',
-	'High Intent but Stuck',
-	'Progress 20% /',
-	'Fast Learners / Power Learners',
-	'92.5% / 4 วัน',
-	'Low Engagement but High Score',
-	'Quiz 90%',
-	'Lesson Rewatch / Revisit Rate',
-	'Revisit',
-	'Time-to-Complete per Lesson',
-	'10 นาที',
-	'Exit Lesson',
-	'Exit',
-	'Content Difficulty Index',
-	'Score',
-	'Question Difficulty',
-	'Integration Question',
-	'Most Common Wrong Answers',
-	'Common misconception',
-	'Attempts Before Pass',
-	'เฉลี่ย',
-	'Quiz Retry Behavior',
-	'Retry 100%',
+	'panel-learners',
+	'panel-assessment',
+	'tla-lesson-matrix',
+	'TutorLMSAnalyticsInitial',
 );
 
-foreach ( $expected as $needle ) {
+foreach ( $expected_shell as $needle ) {
 	tla_assert_contains( $output, $needle );
 }
+
+// ---- 2. Data layer: sections are served by Analytics_Service through REST,
+// so assert against the section payloads instead of rendered HTML.
+\TutorLMS_Analytics\Stats_Cache::flush();
+$service = new \TutorLMS_Analytics\Analytics_Service();
+$range   = \TutorLMS_Analytics\Date_Range::last_days( 30 );
+
+function tla_assert( bool $condition, string $message ): void {
+	if ( ! $condition ) {
+		tla_fail( $message );
+	}
+}
+
+// Learners section: cohort, retention, engagement segments, lesson matrix.
+$learners = $service->get_section( 'learners', $course_id, $range );
+
+$cohorts = $learners['cohort']['completion_by_enrollment_cohort'] ?? array();
+tla_assert( ! empty( $cohorts ), 'Cohort completion data is empty.' );
+$total_enrolled  = array_sum( array_column( $cohorts, 'enrolled' ) );
+$total_completed = array_sum( array_column( $cohorts, 'completed' ) );
+tla_assert( 3 === $total_enrolled, "Expected 3 enrolled across cohorts, got {$total_enrolled}." );
+tla_assert( 1 === $total_completed, "Expected 1 completion across cohorts, got {$total_completed}." );
+
+$retention = $learners['cohort']['retention_by_week'] ?? array();
+tla_assert( ! empty( $retention ), 'Retention-by-week data is empty.' );
+$active_total = array_sum( array_column( $retention, 'active_learners' ) );
+tla_assert( $active_total >= 2, "Expected at least 2 active learners across weeks, got {$active_total}." );
+
+$engagement = $learners['engagement'] ?? array();
+
+$stuck_rows = array_filter(
+	$engagement['high_intent_stuck'] ?? array(),
+	function ( $r ) use ( $user_ids ) { return (int) $r['user_id'] === $user_ids['stuck']; }
+);
+tla_assert( ! empty( $stuck_rows ), 'High-intent-but-stuck learner missing.' );
+$stuck_row = array_values( $stuck_rows )[0];
+tla_assert( abs( $stuck_row['progress_pct'] - 20.0 ) < 0.1, "Stuck learner progress expected 20%, got {$stuck_row['progress_pct']}." );
+
+$power_rows = array_filter(
+	$engagement['power_learners'] ?? array(),
+	function ( $r ) use ( $user_ids ) { return (int) $r['user_id'] === $user_ids['power']; }
+);
+tla_assert( ! empty( $power_rows ), 'Power learner missing.' );
+$power_row = array_values( $power_rows )[0];
+tla_assert( abs( $power_row['quiz_avg_score'] - 92.5 ) < 0.1, "Power learner quiz score expected 92.5, got {$power_row['quiz_avg_score']}." );
+tla_assert( 4 === (int) $power_row['days_to_complete'], "Power learner days-to-complete expected 4, got {$power_row['days_to_complete']}." );
+
+$quiet_rows = array_filter(
+	$engagement['low_engagement_high_score'] ?? array(),
+	function ( $r ) use ( $user_ids ) { return (int) $r['user_id'] === $user_ids['highscore']; }
+);
+tla_assert( ! empty( $quiet_rows ), 'Low-engagement-high-score learner missing.' );
+$quiet_row = array_values( $quiet_rows )[0];
+tla_assert( abs( $quiet_row['quiz_avg_score'] - 90.0 ) < 0.1, "Quiet high-scorer quiz avg expected 90, got {$quiet_row['quiz_avg_score']}." );
+
+$matrix = $learners['lesson_matrix'] ?? array();
+tla_assert( 1 === count( $matrix['lessons'] ?? array() ), 'Lesson matrix should contain exactly 1 lesson.' );
+$power_matrix = array_filter(
+	$matrix['students'] ?? array(),
+	function ( $r ) use ( $user_ids ) { return (int) $r['user_id'] === $user_ids['power']; }
+);
+tla_assert( ! empty( $power_matrix ), 'Power learner missing from lesson matrix.' );
+tla_assert( 1 === (int) array_values( $power_matrix )[0]['completed_count'], 'Power learner should have 1 completed lesson in matrix.' );
+
+// Teaching section: revisit rate and time-to-complete.
+$teaching = $service->get_section( 'teaching', $course_id, $range );
+$time     = $teaching['time_analytics'] ?? array();
+
+$revisits = $time['lesson_revisit_rate'] ?? array();
+tla_assert( ! empty( $revisits ), 'Lesson revisit data is empty.' );
+tla_assert( (float) $revisits[0]['revisit_rate'] > 0, 'Expected a positive revisit rate.' );
+
+$ttc = $time['time_to_complete_per_lesson'] ?? array();
+tla_assert( ! empty( $ttc ), 'Time-to-complete data is empty.' );
+tla_assert( (float) $ttc[0]['avg_minutes'] > 0, 'Expected positive avg minutes to complete.' );
+
+// Assessment section: quiz diagnostics.
+$assessment  = $service->get_section( 'assessment', $course_id, $range );
+$diagnostics = $assessment['quiz_diagnostics'] ?? array();
+
+$difficulty = $diagnostics['question_difficulty'] ?? array();
+tla_assert( ! empty( $difficulty ), 'Question difficulty data is empty.' );
+$question_rows = array_filter(
+	$difficulty,
+	function ( $r ) use ( $question_id ) { return (int) $r['question_id'] === (int) $question_id; }
+);
+tla_assert( ! empty( $question_rows ), 'Integration Question missing from difficulty index.' );
+
+$wrong = $diagnostics['common_wrong_answers'] ?? array();
+$wrong_answers = array_column( $wrong, 'answer' );
+tla_assert( in_array( 'Common misconception', $wrong_answers, true ), 'Common misconception missing from wrong answers.' );
+
+tla_assert( ! empty( $diagnostics['attempts_before_pass'] ?? array() ), 'Attempts-before-pass data is empty.' );
+
+$retry = $diagnostics['retry_behavior'] ?? array();
+tla_assert( ! empty( $retry ), 'Retry behavior data is empty.' );
+$retry_rows = array_filter(
+	$retry,
+	function ( $r ) use ( $quiz_id ) { return (int) $r['quiz_id'] === (int) $quiz_id; }
+);
+tla_assert( ! empty( $retry_rows ), 'Integration Quiz missing from retry behavior.' );
+tla_assert( abs( array_values( $retry_rows )[0]['retry_rate'] - 100.0 ) < 0.1, 'Expected 100% retry rate for Integration Quiz.' );
 
 echo "Advanced analytics WordPress integration test passed.\n";

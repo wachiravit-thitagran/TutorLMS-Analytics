@@ -186,6 +186,12 @@ $tabs = array(
 				<p class="tla-card-desc"><?php esc_html_e( 'ค้นหา / จัดเรียงได้ทุกคอลัมน์', 'tutorlms-analytics' ); ?></p>
 				<div id="tla-learner-table"></div>
 			</div>
+			<div class="tla-grid cols-2">
+				<?php
+				tla_chart_card( 'chart-cohort', __( 'อัตราการเรียนจบตามกลุ่มผู้สมัคร (Cohort)', 'tutorlms-analytics' ) );
+				tla_chart_card( 'chart-retention', __( 'อัตราการเข้าเรียนอย่างต่อเนื่องรายสัปดาห์ (Retention)', 'tutorlms-analytics' ) );
+				?>
+			</div>
 		</div>
 	</section>
 

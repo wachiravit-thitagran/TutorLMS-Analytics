@@ -190,11 +190,13 @@ class Analytics_Service {
 		$student    = new Providers\Student_Provider();
 		$engagement = new Providers\Engagement_Provider();
 		$matrix     = new Providers\Lesson_Matrix_Provider();
+		$cohort     = new Providers\Cohort_Provider();
 
 		return array(
 			'student_table' => $student->get_student_table( $course_id ),
 			'engagement'    => $engagement->get_engagement_data( $course_id ),
 			'lesson_matrix' => $matrix->get_lesson_matrix( $course_id ),
+			'cohort'        => $cohort->get_cohort_analytics( $course_id ),
 		);
 	}
 
