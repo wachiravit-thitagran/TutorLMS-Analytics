@@ -156,12 +156,12 @@ tla_assert( $inserted_event->event_value === '123', "REST Endpoint saved event_v
 // -----------------------------------------------------------------------------
 echo "\n--- Test: Data Isolation ---\n";
 // Create Course A and B
-$course_a = wp_insert_post(['post_type' => 'courses', 'post_title' => 'Course Alpha']);
-$course_b = wp_insert_post(['post_type' => 'courses', 'post_title' => 'Course Beta']);
-$topic_a = wp_insert_post(['post_type' => 'topics', 'post_parent' => $course_a]);
-$lesson_a = wp_insert_post(['post_type' => 'lesson', 'post_title' => 'Lesson Alpha', 'post_parent' => $topic_a]);
-$topic_b = wp_insert_post(['post_type' => 'topics', 'post_parent' => $course_b]);
-$lesson_b = wp_insert_post(['post_type' => 'lesson', 'post_title' => 'Lesson Beta', 'post_parent' => $topic_b]);
+$course_a = wp_insert_post(['post_type' => 'courses', 'post_title' => 'Course Alpha', 'post_status' => 'publish']);
+$course_b = wp_insert_post(['post_type' => 'courses', 'post_title' => 'Course Beta', 'post_status' => 'publish']);
+$topic_a = wp_insert_post(['post_type' => 'topics', 'post_parent' => $course_a, 'post_status' => 'publish']);
+$lesson_a = wp_insert_post(['post_type' => 'lesson', 'post_title' => 'Lesson Alpha', 'post_parent' => $topic_a, 'post_status' => 'publish']);
+$topic_b = wp_insert_post(['post_type' => 'topics', 'post_parent' => $course_b, 'post_status' => 'publish']);
+$lesson_b = wp_insert_post(['post_type' => 'lesson', 'post_title' => 'Lesson Beta', 'post_parent' => $topic_b, 'post_status' => 'publish']);
 
 // Seed Event for A
 $wpdb->insert($table_name, [
@@ -225,8 +225,9 @@ echo "\n--- Test: Admin Asset Enqueue ---\n";
 $menu->register();
 do_action( 'admin_enqueue_scripts', 'tutor-lms_page_tutorlms-analytics' );
 
-tla_assert( wp_script_is( 'chart-js', 'enqueued' ), "Chart.js is enqueued correctly." );
-tla_assert( wp_script_is( 'tailwindcss', 'enqueued' ), "Tailwind CSS is enqueued correctly." );
+tla_assert( wp_script_is( 'tutorlms-analytics-chartjs', 'enqueued' ), "Chart.js (vendored) is enqueued correctly." );
+tla_assert( wp_script_is( 'tutorlms-analytics-dashboard', 'enqueued' ), "Dashboard JS is enqueued correctly." );
+tla_assert( wp_style_is( 'tutorlms-analytics-dashboard', 'enqueued' ), "Dashboard CSS is enqueued correctly." );
 
 
 // -----------------------------------------------------------------------------
