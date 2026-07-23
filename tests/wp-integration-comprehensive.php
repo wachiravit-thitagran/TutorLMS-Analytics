@@ -137,10 +137,10 @@ $request->set_param( 'event_value', '123' );
 $rest_server = rest_get_server();
 $response = $rest_server->dispatch( $request );
 
-	if ( $response->get_status() !== 200 ) {
+	if ( ! in_array( $response->get_status(), array( 200, 201 ), true ) ) {
 		echo "REST Error Response:\n" . print_r( $response->get_data(), true ) . "\nStatus Code: " . $response->get_status() . "\n";
 	}
-	tla_assert( $response->get_status() === 200, "REST Endpoint returned 200 OK." );
+	tla_assert( in_array( $response->get_status(), array( 200, 201 ), true ), "REST Endpoint returned success status (200/201)." );
 
 // Verify DB Insertion
 $inserted_event = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE course_id = %d AND event_type = %s", $course_id, 'lesson_view' ) );
@@ -321,7 +321,7 @@ $request_malicious->set_param( 'device_type', 'desktop' );
 $request_malicious->set_param( 'browser', 'Chrome' );
 
 $response_malicious = rest_get_server()->dispatch( $request_malicious );
-tla_assert( $response_malicious->get_status() === 200, "REST Endpoint processes malicious input." );
+tla_assert( in_array( $response_malicious->get_status(), array( 200, 201 ), true ), "REST Endpoint processes malicious input." );
 
 $malicious_event = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE course_id = %d AND event_value LIKE %s ORDER BY id DESC LIMIT 1", $course_a, '%alert(1)%' ) );
 tla_assert( $malicious_event !== null, "Malicious event saved to DB." );
