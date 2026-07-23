@@ -239,10 +239,12 @@ ob_start();
 $menu->render_page();
 $output = ob_get_clean();
 
+// Use translation-invariant markers (element IDs / post titles): translatable
+// strings render in the site locale, e.g. English on the CI install.
 $expected_shell = array(
 	'WP Integration Analytics Course',
-	'อัตราการเรียนจบตามกลุ่มผู้สมัคร (Cohort)',
-	'อัตราการเข้าเรียนอย่างต่อเนื่องรายสัปดาห์ (Retention)',
+	'chart-cohort',
+	'chart-retention',
 	'panel-learners',
 	'panel-assessment',
 	'tla-lesson-matrix',

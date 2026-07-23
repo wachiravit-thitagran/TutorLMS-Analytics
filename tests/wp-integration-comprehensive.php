@@ -106,7 +106,7 @@ $menu->render_page();
 $output_empty = ob_get_clean();
 
 tla_assert_contains( $output_empty, 'Tutor Analytics', "Global dashboard renders without fatal error." );
-tla_assert_contains( $output_empty, 'แนวโน้มการสมัครเรียน', "Global dashboard contains the enrollment trend card." );
+tla_assert_contains( $output_empty, 'chart-enrollment', "Global dashboard contains the enrollment trend card." );
 // Note: Depending on UI, it might just render '0' or specific empty messages.
 tla_assert_contains( $output_empty, '0', "Empty state renders zero values correctly." );
 
@@ -202,7 +202,7 @@ $menu->render_page();
 $output_missing_tables = ob_get_clean();
 unset( $_GET['course_id'] );
 
-tla_assert_contains( $output_missing_tables, 'สถิติรายคอร์ส', "Dashboard renders without fatal error even when quiz tables are missing." );
+tla_assert_contains( $output_missing_tables, 'Course Alpha', "Dashboard renders without fatal error even when quiz tables are missing." );
 
 
 // -----------------------------------------------------------------------------
