@@ -15,10 +15,10 @@ echo "Copying files to build directory..."
 rsync -av \
   --exclude='.git' \
   --exclude='.github' \
-  --exclude='tests' \
-  --exclude='bin' \
-  --exclude='build' \
-  --exclude='dist' \
+  --exclude='/tests' \
+  --exclude='/bin' \
+  --exclude='/build' \
+  --exclude='/dist' \
   --exclude='vendor' \
   --exclude='.gitignore' \
   --exclude='composer.json' \
