@@ -102,6 +102,8 @@ function enqueue_tracker() {
 register_activation_hook( __FILE__, __NAMESPACE__ . '\\activate_plugin' );
 function activate_plugin() {
 	Database::create_tables();
+	// Drop any stale cached payloads from a previous version on (re)activation.
+	Stats_Cache::flush();
 }
 
 /**

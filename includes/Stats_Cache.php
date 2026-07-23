@@ -50,6 +50,10 @@ class Stats_Cache {
 
 	private static function build_key( string $key ): string {
 		$version = function_exists( 'get_option' ) ? (string) get_option( self::VERSION_KEY, '1' ) : '1';
-		return self::PREFIX . md5( $version . '|' . $key );
+		// Fold the plugin version into the salt so shipping new code (new
+		// provider fields, changed queries) auto-invalidates stale payloads
+		// without needing a manual flush.
+		$code_version = defined( 'TUTORLMS_ANALYTICS_VERSION' ) ? TUTORLMS_ANALYTICS_VERSION : '0';
+		return self::PREFIX . md5( $version . '|' . $code_version . '|' . $key );
 	}
 }
