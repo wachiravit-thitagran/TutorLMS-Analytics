@@ -476,7 +476,10 @@
 	renderers.assessment = function ( d ) {
 		var qd = d.quiz_diagnostics || {}, qt = d.quiz_types || {}, a = d.assignments || {}, g = d.gradebook || {};
 		rankedList( 'tla-q-difficulty', qd.question_difficulty || [], function ( r ) { return { title: r.title || ( 'ข้อ ' + r.question_id ), meta: 'ตอบถูก ' + r.correct_rate + '%' }; }, 'ไม่มีข้อมูล' );
-		rankedList( 'tla-q-wrong', qd.common_wrong_answers || [], function ( r ) { return { title: r.answer || r.title, meta: 'เลือกผิด ' + r.selected_count + ' ครั้ง' }; }, 'ไม่มีข้อมูล' );
+		rankedList( 'tla-q-wrong', qd.common_wrong_answers || [], function ( r ) {
+			var title = r.question_title ? r.question_title + ' — ' + ( r.answer || '' ) : ( r.answer || r.title );
+			return { title: title, meta: 'เลือกผิด ' + r.selected_count + ' ครั้ง' };
+		}, 'ไม่มีข้อมูล' );
 		var types = qt.types || [];
 		draw( 'chart-quiz-types', types.length > 0, function () {
 			return barSeries( 'จำนวนคำถาม', types.map( function ( r ) { return r.label; } ), types.map( function ( r ) { return r.questions; } ),

@@ -178,14 +178,85 @@ class Quiz_Provider {
 
 		$data = [];
 		foreach ( (array) $rows as $row ) {
+			$question_id = (int) $row['question_id'];
 			$data[] = array(
-				'question_id'    => (int) $row['question_id'],
-				'answer'         => (string) $row['answer'],
+				'question_id'    => $question_id,
+				'question_title' => get_the_title( $question_id ),
+				'answer'         => $this->format_given_answer( (string) $row['answer'] ),
 				'selected_count' => (int) $row['selected_count'],
 			);
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Convert a raw given_answer value into human-readable text.
+	 *
+	 * Tutor LMS stores choice-based answers as a PHP-serialized array of
+	 * answer-option IDs (e.g. a:1:{i:0;s:1:"2";}); open-ended answers are
+	 * stored as plain text.
+	 */
+	private function format_given_answer( string $raw ): string {
+		$raw = trim( $raw );
+		if ( '' === $raw ) {
+			return '—';
+		}
+
+		$values = array( $raw );
+
+		if ( function_exists( 'is_serialized' ) && is_serialized( $raw ) ) {
+			$decoded = @unserialize( $raw, array( 'allowed_classes' => false ) );
+			if ( is_array( $decoded ) ) {
+				$values = array_values( $decoded );
+			} elseif ( is_scalar( $decoded ) ) {
+				$values = array( (string) $decoded );
+			}
+		} elseif ( 0 === strpos( $raw, '[' ) || 0 === strpos( $raw, '{' ) ) {
+			$decoded = json_decode( $raw, true );
+			if ( is_array( $decoded ) ) {
+				$values = array_values( $decoded );
+			}
+		}
+
+		$labels = array();
+		foreach ( $values as $value ) {
+			if ( is_array( $value ) ) {
+				$value = implode( ' ', array_map( 'strval', $value ) );
+			}
+			$value = (string) $value;
+			$label = is_numeric( $value ) ? $this->answer_option_title( (int) $value ) : '';
+			$labels[] = '' !== $label ? $label : wp_strip_all_tags( $value );
+		}
+
+		return implode( ', ', array_filter( $labels, 'strlen' ) );
+	}
+
+	/**
+	 * Look up the option text for an answer-option ID (cached per request).
+	 */
+	private function answer_option_title( int $answer_id ): string {
+		global $wpdb;
+		static $cache = array();
+		static $table_exists = null;
+
+		if ( isset( $cache[ $answer_id ] ) ) {
+			return $cache[ $answer_id ];
+		}
+
+		$table = $wpdb->prefix . 'tutor_quiz_question_answers';
+		if ( null === $table_exists ) {
+			$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" ) === $table;
+		}
+		if ( ! $table_exists ) {
+			return $cache[ $answer_id ] = '';
+		}
+
+		$title = (string) $wpdb->get_var(
+			$wpdb->prepare( "SELECT answer_title FROM {$table} WHERE answer_id = %d", $answer_id )
+		);
+
+		return $cache[ $answer_id ] = wp_strip_all_tags( $title );
 	}
 
 	public function get_attempts_before_pass( int $course_id = 0, int $limit = 10 ): array {
