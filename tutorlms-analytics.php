@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: TutorLMS Analytics
- * Plugin URI: https://example.com
+ * Plugin URI: https://github.com/wachiravit-thitagran/TutorLMS-Analytics
  * Description: In-depth statistics and analytics dashboard for Tutor LMS 4.0 (revenue, subscriptions, bundles, Q&A, certificates, assignments, live lessons, quiz-type adoption and more).
  * Version: 2.0.0
  * Author: BIA
@@ -29,6 +29,13 @@ if ( ! defined( 'TUTORLMS_ANALYTICS_DIR' ) ) {
 }
 if ( ! defined( 'TUTORLMS_ANALYTICS_URL' ) ) {
 	define( 'TUTORLMS_ANALYTICS_URL', plugin_dir_url( __FILE__ ) );
+}
+if ( ! defined( 'TUTORLMS_ANALYTICS_GITHUB_REPO' ) ) {
+	// Repository whose releases are offered as updates. Must match the Plugin URI
+	// above — the GitHub API answers a typo with the same 404 as a repo with no
+	// releases, so a wrong slug disables updates without any error anywhere.
+	// Override in wp-config.php to point an install at a fork.
+	define( 'TUTORLMS_ANALYTICS_GITHUB_REPO', 'wachiravit-thitagran/TutorLMS-Analytics' );
 }
 
 /**
@@ -59,6 +66,10 @@ spl_autoload_register(
 function init() {
 	load_plugin_textdomain( 'tutorlms-analytics', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
+	// Before the Tutor LMS check: updates must keep flowing even while Tutor LMS is
+	// missing or temporarily deactivated.
+	init_updater();
+
 	if ( ! function_exists( 'tutor_utils' ) ) {
 		add_action( 'admin_notices', __NAMESPACE__ . '\\missing_tutor_notice' );
 		return;
@@ -78,6 +89,31 @@ function init() {
 	add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\enqueue_tracker' );
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
+
+/**
+ * Register self-hosted updates from this repository's GitHub releases.
+ *
+ * The plugin is not on wordpress.org, so without this the Updates screen never
+ * offers anything and sites drift behind the published releases.
+ */
+function init_updater() {
+	/**
+	 * Filters the GitHub "owner/repo" checked for releases. Return '' to switch
+	 * self-hosted updates off entirely.
+	 *
+	 * @param string $repo GitHub "owner/repo".
+	 */
+	$repo = (string) apply_filters(
+		'tutorlms_analytics_github_repo',
+		defined( 'TUTORLMS_ANALYTICS_GITHUB_REPO' ) ? TUTORLMS_ANALYTICS_GITHUB_REPO : ''
+	);
+
+	if ( '' === $repo ) {
+		return;
+	}
+
+	( new Github_Updater( __FILE__, 'tutorlms-analytics', $repo, TUTORLMS_ANALYTICS_VERSION, 'tutorlms-analytics.zip' ) )->register();
+}
 
 /**
  * Enqueue frontend tracker.

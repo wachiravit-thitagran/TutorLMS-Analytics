@@ -405,5 +405,96 @@ if ( ! function_exists( 'delete_transient' ) ) {
 	}
 }
 
+if ( ! function_exists( 'add_filter' ) ) {
+	function add_filter( $hook, $callback, $priority = 10, $accepted_args = 1 ) {
+		$GLOBALS['mock_filters'][ $hook ][] = $callback;
+		return true;
+	}
+}
+if ( ! function_exists( 'apply_filters' ) ) {
+	function apply_filters( $hook, $value, ...$args ) {
+		return $value;
+	}
+}
+if ( ! function_exists( 'trailingslashit' ) ) {
+	function trailingslashit( $string ) {
+		return rtrim( (string) $string, '/\\' ) . '/';
+	}
+}
+if ( ! function_exists( 'untrailingslashit' ) ) {
+	function untrailingslashit( $string ) {
+		return rtrim( (string) $string, '/\\' );
+	}
+}
+if ( ! function_exists( 'wpautop' ) ) {
+	function wpautop( $text, $br = true ) {
+		return '<p>' . trim( (string) $text ) . '</p>';
+	}
+}
+if ( ! function_exists( 'wp_kses_post' ) ) {
+	function wp_kses_post( $text ) {
+		return (string) $text;
+	}
+}
+if ( ! function_exists( 'get_plugin_data' ) ) {
+	function get_plugin_data( $file, $markup = true, $translate = true ) {
+		return $GLOBALS['mock_plugin_data'] ?? array(
+			'Name'        => 'TutorLMS Analytics',
+			'Description' => 'In-depth statistics and analytics dashboard for Tutor LMS.',
+			'Author'      => 'BIA',
+			'RequiresWP'  => '5.3',
+			'RequiresPHP' => '7.4',
+		);
+	}
+}
+
+// HTTP API mock. Tests set $GLOBALS['mock_http_response'] to the array (or WP_Error)
+// that the next wp_remote_get() should hand back; requests land in
+// $GLOBALS['mock_http_requests'].
+if ( ! class_exists( 'WP_Error' ) ) {
+	class WP_Error {
+		public $code;
+		public $message;
+
+		public function __construct( $code = '', $message = '' ) {
+			$this->code    = $code;
+			$this->message = $message;
+		}
+
+		public function get_error_code() {
+			return $this->code;
+		}
+
+		public function get_error_message() {
+			return $this->message;
+		}
+	}
+}
+if ( ! function_exists( 'is_wp_error' ) ) {
+	function is_wp_error( $thing ) {
+		return $thing instanceof WP_Error;
+	}
+}
+if ( ! function_exists( 'wp_remote_get' ) ) {
+	function wp_remote_get( $url, $args = array() ) {
+		$GLOBALS['mock_http_requests'][] = array(
+			'url'  => $url,
+			'args' => $args,
+		);
+
+		return $GLOBALS['mock_http_response'] ?? new WP_Error( 'http_request_failed', 'No mock HTTP response set.' );
+	}
+}
+if ( ! function_exists( 'wp_remote_retrieve_response_code' ) ) {
+	function wp_remote_retrieve_response_code( $response ) {
+		return is_array( $response ) ? ( $response['response']['code'] ?? 0 ) : 0;
+	}
+}
+if ( ! function_exists( 'wp_remote_retrieve_body' ) ) {
+	function wp_remote_retrieve_body( $response ) {
+		return is_array( $response ) ? ( $response['body'] ?? '' ) : '';
+	}
+}
+
 // Load the main plugin file
 require dirname( __DIR__ ) . '/tutorlms-analytics.php';

@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### อัปเดตอัตโนมัติจาก GitHub Releases
+
+ก่อนหน้านี้ทุก release ถูก build เป็น `tutorlms-analytics.zip` แนบไว้ที่ GitHub Release แต่ปลั๊กอินไม่มีตัวตรวจอัปเดต — หน้า "อัปเดต" ของ WordPress จึงไม่เคยแจ้งอะไร และเว็บจริงค้างอยู่เวอร์ชันเก่าโดยไม่มีสัญญาณเตือน
+
+- **`Github_Updater`** (`includes/Github_Updater.php`) — เทียบ tag ของ release ล่าสุดกับเวอร์ชันที่ติดตั้ง แล้วเสนออัปเดตผ่านหน้าปลั๊กอิน/หน้าอัปเดตตามปกติ พร้อมข้อมูลใน modal "ดูรายละเอียด" (release notes)
+- เลือกไฟล์ `tutorlms-analytics.zip` ที่ build ไว้ก่อน source zipball ของ GitHub เพื่อให้ชื่อโฟลเดอร์ปลั๊กอินหลังอัปเดตยังถูกต้อง (zipball จะแตกเป็น `owner-repo-<sha>/`)
+- cache คำตอบจาก GitHub API ไว้ใน transient 6 ชั่วโมง และ cache กรณีล้มเหลว 1 ชั่วโมง — request ที่ error/404 หรือ JSON เสียจะถือว่า "ไม่มี release" เงียบ ๆ ไม่มี notice หรือ fatal บนหน้าปลั๊กอิน
+- ตั้ง repo ปลายทางด้วยค่าคงที่ `TUTORLMS_ANALYTICS_GITHUB_REPO` (override ได้ใน `wp-config.php`) และ filter `tutorlms_analytics_github_repo` ส่ง `''` เพื่อปิดฟีเจอร์ ส่วน filter `tutorlms_analytics_github_request_args` ใช้ใส่ token ได้
+- แก้ header `Plugin URI` ให้ชี้ repo จริง และมี test ตรึงค่า slug ให้ตรงกับ `Plugin URI` เสมอ เพราะ owner ที่พิมพ์ผิดจะได้ 404 เหมือน repo ที่ไม่มี release คือพังแบบไม่มีใครรู้
+- `tests/GithubUpdaterTest.php` — 26 tests ครอบคลุมการเทียบเวอร์ชัน, การเลือก asset, cache/negative cache และความสอดคล้องของ slug กับ `Plugin URI`
+
 ## 2.0.0 — Tutor LMS 4.0 support + dashboard overhaul
 
 รอบนี้ทำครบทุกข้อเสนอแนะ ทั้งสถิติใหม่จาก Tutor LMS 4.0 และการปรับปรุง UI
