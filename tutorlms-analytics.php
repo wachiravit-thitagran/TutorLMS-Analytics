@@ -77,6 +77,7 @@ function init() {
 
 	( new Admin_Menu() )->register();
 	( new REST_API() )->register();
+	MCP::register();
 	( new Export_Handler() )->register();
 
 	// Invalidate cached stats when the underlying data changes so the dashboard
