@@ -137,8 +137,14 @@ class REST_API {
 		$user_id    = get_current_user_id();
 		$course_id  = isset( $params['course_id'] ) ? (int) $params['course_id'] : 0;
 		$lesson_id  = isset( $params['lesson_id'] ) ? (int) $params['lesson_id'] : 0;
-		$event_type = sanitize_text_field( (string) $params['event_type'] );
-		$event_val  = isset( $params['event_value'] ) ? sanitize_text_field( (string) $params['event_value'] ) : '';
+		$event_type = sanitize_key( (string) $params['event_type'] );
+		$allowed_events = array( 'page_view', 'video_watch_heartbeat', 'page_exit' );
+		if ( ! in_array( $event_type, $allowed_events, true ) ) {
+			return new WP_REST_Response( array( 'success' => false, 'error' => 'Invalid event_type' ), 400 );
+		}
+
+		$event_val = isset( $params['event_value'] ) ? sanitize_text_field( (string) $params['event_value'] ) : '';
+		$event_val = function_exists( 'mb_substr' ) ? mb_substr( $event_val, 0, 2048 ) : substr( $event_val, 0, 2048 );
 
 		// Parse minimal User-Agent.
 		$ua      = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
