@@ -45,9 +45,26 @@ class REST_API {
 		);
 	}
 
-	/** Only users who can see the analytics menu may pull section data. */
-	public function can_view_analytics(): bool {
-		return current_user_can( 'manage_tutor' ) || current_user_can( 'manage_options' ) || current_user_can( 'tutor_instructor' );
+	/**
+	 * Staff may view global analytics; instructors are restricted to courses
+	 * they can edit. This prevents an instructor from querying another
+	 * instructor's learners/revenue by changing course_id in the request.
+	 */
+	public function can_view_analytics( WP_REST_Request $request ): bool {
+		if ( current_user_can( 'manage_tutor' ) || current_user_can( 'manage_options' ) ) {
+			return true;
+		}
+
+		if ( ! current_user_can( 'tutor_instructor' ) ) {
+			return false;
+		}
+
+		$course_id = absint( $request->get_param( 'course_id' ) );
+		if ( $course_id <= 0 ) {
+			return false;
+		}
+
+		return current_user_can( 'edit_post', $course_id );
 	}
 
 	/**
