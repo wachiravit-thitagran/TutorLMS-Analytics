@@ -20,7 +20,7 @@ final class MCP {
 			'tutorlms-analytics',
 			array(
 				'label'       => 'TutorLMS Analytics',
-				'description' => 'Tutor LMS analytics and reporting abilities.',
+				'description' => 'Analytics and reporting data derived from Tutor LMS activity and course usage.',
 			)
 		);
 	}
@@ -30,7 +30,7 @@ final class MCP {
 			'tutorlms-analytics/get-section',
 			array(
 				'label'       => 'Get Analytics Section',
-				'description' => 'Return a TutorLMS Analytics dashboard section for a date range.',
+				'description' => 'Retrieves a named analytics section, optionally filtered by course and date range.',
 				'category'    => 'tutorlms-analytics',
 				'input_schema' => array(
 					'type'       => 'object',
