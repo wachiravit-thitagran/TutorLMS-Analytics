@@ -138,7 +138,7 @@ class REST_API {
 		$course_id  = isset( $params['course_id'] ) ? (int) $params['course_id'] : 0;
 		$lesson_id  = isset( $params['lesson_id'] ) ? (int) $params['lesson_id'] : 0;
 		$event_type = sanitize_key( (string) $params['event_type'] );
-		$allowed_events = array( 'page_view', 'video_watch_heartbeat', 'page_exit' );
+		$allowed_events = array( 'page_view', 'course_view', 'lesson_view', 'video_watch_heartbeat', 'page_exit' );
 		if ( ! in_array( $event_type, $allowed_events, true ) ) {
 			return new WP_REST_Response( array( 'success' => false, 'error' => 'Invalid event_type' ), 400 );
 		}
