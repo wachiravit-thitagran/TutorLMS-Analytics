@@ -22,12 +22,32 @@ jobs:
   build:
     if: ${{ !contains(github.event.head_commit.message, '[skip release]') }}
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Set up PHP and WP-CLI
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: wp-cli
+          coverage: none
 
       - name: Compute next version
         id: ver
@@ -77,6 +97,35 @@ jobs:
 
       - name: List artifacts
         run: ls -lh dist/
+
+      - name: Validate packaged plugin ZIP in clean WordPress
+        env:
+          NEXT: ${{ steps.ver.outputs.next }}
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/release-wp
+          mkdir -p /tmp/release-wp
+          cd /tmp/release-wp
+
+          wp core download --allow-root
+          wp config create --dbname=wordpress --dbuser=root --dbpass=root --dbhost=127.0.0.1 --allow-root
+          wp core install --url=http://localhost --title="Release Validation" --admin_user=admin --admin_password=admin --admin_email=admin@example.test --skip-email --allow-root
+
+          wp plugin install tutor --activate --allow-root
+
+          plugin_zip="$(find "$GITHUB_WORKSPACE/dist" -maxdepth 1 -type f -name '*.zip' | head -n1)"
+          test -n "$plugin_zip"
+
+          wp plugin install "$plugin_zip" --activate --force --allow-root
+          wp plugin is-active tutorlms-analytics --allow-root
+
+          test "$(wp plugin get tutorlms-analytics --field=version --allow-root)" = "$NEXT"
+
+          wp plugin deactivate tutorlms-analytics --allow-root
+          wp plugin activate tutorlms-analytics --allow-root
+          wp plugin is-active tutorlms-analytics --allow-root
+
+          wp eval 'echo "Packaged TutorLMS Analytics plugin loaded successfully.\n";' --allow-root
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
