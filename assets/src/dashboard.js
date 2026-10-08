@@ -432,7 +432,23 @@
 			cfgc.options.scales = { y: { min: 0, max: 100 } };
 			return cfgc;
 		} );
-		draw( 'chart-progress', objHasValues( d.progress_distribution ), function () { return doughnut( Object.keys( d.progress_distribution ), Object.values( d.progress_distribution ) ); } );
+		draw( 'chart-progress', objHasValues( d.progress_distribution ), function () {
+			var distribution = d.progress_distribution;
+			var cfgc = doughnut( Object.keys( distribution ), Object.values( distribution ) );
+			cfgc.options.plugins.tooltip = {
+				enabled: true,
+				callbacks: {
+					label: function ( context ) {
+						var values = context.dataset.data;
+						var total = values.reduce( function ( sum, value ) { return sum + ( Number( value ) || 0 ); }, 0 );
+						var count = Number( context.raw ) || 0;
+						var share = total > 0 ? ( 100 * count / total ).toFixed( 1 ) : '0.0';
+						return context.label + ': ' + count + ' คน (' + share + '% ของผู้เรียน)';
+					}
+				}
+			};
+			return cfgc;
+		} );
 		draw( 'chart-quiz-dist', objHasValues( d.quiz_score_distribution ), function () { return barSeries( 'ผู้เข้าสอบ', Object.keys( d.quiz_score_distribution ), Object.values( d.quiz_score_distribution ), [ C.red, C.orange, C.sky, C.green ] ); } );
 		draw( 'chart-passfail', objHasValues( d.pass_fail_ratio ), function () { return doughnut( Object.keys( d.pass_fail_ratio ), Object.values( d.pass_fail_ratio ) ); } );
 		draw( 'chart-enrollment', seriesHasData( d.enrollment_trend ), function () { return lineSeries( 'ผู้สมัครใหม่', d.enrollment_trend, C.blue ); } );
