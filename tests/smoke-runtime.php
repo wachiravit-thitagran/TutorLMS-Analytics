@@ -204,7 +204,7 @@ $GLOBALS['wpdb'] = $wpdb2;
 // Reset Tutor_Schema table cache between scenarios.
 ( function () {
 	$ref = new ReflectionProperty( Tutor_Schema::class, 'table_cache' );
-	$ref->setAccessible( true );
+	if ( PHP_VERSION_ID < 80100 ) { $ref->setAccessible( true ); }
 	$ref->setValue( array() );
 } )();
 
@@ -244,7 +244,7 @@ $wpdb4->mock_results = array(
 $GLOBALS['wpdb'] = $wpdb4;
 ( function () {
 	$ref = new ReflectionProperty( Tutor_Schema::class, 'table_cache' );
-	$ref->setAccessible( true );
+	if ( PHP_VERSION_ID < 80100 ) { $ref->setAccessible( true ); }
 	$ref->setValue( array() );
 } )();
 $qt2 = ( new Quiz_Type_Provider() )->get_question_type_stats( 0 );

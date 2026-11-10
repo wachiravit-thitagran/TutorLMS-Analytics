@@ -43,7 +43,7 @@ class GithubUpdaterTest extends TestCase {
 	private function invoke( object $object, string $method, array $args = array() ) {
 		$ref = new ReflectionMethod( $object, $method );
 		if ( PHP_VERSION_ID < 80100 ) {
-			$ref->setAccessible( true );
+			if ( PHP_VERSION_ID < 80100 ) { $ref->setAccessible( true ); }
 		}
 		return $ref->invokeArgs( $object, $args );
 	}

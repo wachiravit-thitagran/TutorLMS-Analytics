@@ -47,8 +47,8 @@ class Student_Provider {
 				$q_where = "q.user_id IN ($in_users) AND q.total_marks > 0";
 				$q_join = "";
 				if ( $course_id > 0 ) {
-					$q_where .= $wpdb->prepare( " AND p.post_parent = %d", $course_id );
-					$q_join = "INNER JOIN {$wpdb->posts} p ON q.quiz_id = p.ID";
+					$q_where .= $wpdb->prepare( " AND topic.post_parent = %d", $course_id );
+					$q_join = "INNER JOIN {$wpdb->posts} quiz ON q.quiz_id = quiz.ID INNER JOIN {$wpdb->posts} topic ON quiz.post_parent = topic.ID";
 				}
 				$q_query = "
 					SELECT q.user_id, 
@@ -94,7 +94,7 @@ class Student_Provider {
 							$avg_progress = ( $completed_lesson / $total_lesson ) * 100;
 						}
 					}
-				} else {
+				} elseif ( 0 === $course_id ) {
 					$total_pct = 0;
 					$count = 0;
 					foreach ( $progress_meta as $cid => $d ) {

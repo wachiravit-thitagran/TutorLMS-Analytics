@@ -73,7 +73,7 @@ class DataProviderTest extends TestCase {
 		// Use reflection to call private method
 		$reflection = new ReflectionClass( $this->provider );
 		$method = $reflection->getMethod( 'get_course_popularity' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) { $method->setAccessible( true ); }
 
 		$popularity = $method->invoke( $this->provider );
 		
@@ -99,7 +99,7 @@ class DataProviderTest extends TestCase {
 
 		$reflection = new ReflectionClass( $this->provider );
 		$method = $reflection->getMethod( 'get_course_popularity' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) { $method->setAccessible( true ); }
 
 		$popularity = $method->invoke( $this->provider );
 		
@@ -117,7 +117,7 @@ class DataProviderTest extends TestCase {
 
 		$reflection = new ReflectionClass( $this->provider );
 		$method = $reflection->getMethod( 'get_activity_by_day_of_week' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) { $method->setAccessible( true ); }
 
 		$activity = $method->invoke( $this->provider, 0 );
 		
@@ -138,7 +138,7 @@ class DataProviderTest extends TestCase {
 
 		$reflection = new ReflectionClass( $this->provider );
 		$method = $reflection->getMethod( 'get_enrollment_trend_30_days' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) { $method->setAccessible( true ); }
 
 		$trend = $method->invoke( $this->provider, 0 );
 		
