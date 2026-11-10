@@ -151,7 +151,7 @@ class REST_API {
 		$device  = $this->parse_device( $ua );
 		$browser = $this->parse_browser( $ua );
 
-		$wpdb->insert(
+		$inserted = $wpdb->insert(
 			Database::get_events_table_name(),
 			array(
 				'user_id'     => $user_id,
@@ -167,6 +167,9 @@ class REST_API {
 			array( '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s' )
 		);
 
+		if ( false === $inserted ) {
+			return new WP_REST_Response( array( 'success' => false, 'error' => 'Could not persist tracking event' ), 500 );
+		}
 		return new WP_REST_Response( array( 'success' => true ), 201 );
 	}
 

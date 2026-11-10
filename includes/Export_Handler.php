@@ -7,6 +7,19 @@ class Export_Handler {
 
 	public const NONCE_ACTION = 'tutorlms_analytics_export';
 
+	/** Keep untrusted spreadsheet text literal, including whitespace prefixes. */
+	public static function csv_cell( $value ) {
+		if ( is_string( $value ) && preg_match( '/^[\x00-\x20\x{FEFF}\p{Z}]*[=+@-]/u', $value ) ) {
+			return "'" . $value;
+		}
+		return $value;
+	}
+
+	private function write_row( $output, array $row ): void {
+		fputcsv( $output, array_map( array( self::class, 'csv_cell' ), $row ), ',', '"', '' );
+	}
+
+
 	public function register(): void {
 		add_action( 'admin_post_tutorlms_export_revenue', array( $this, 'export_revenue' ) );
 		add_action( 'admin_post_tutorlms_export_courses', array( $this, 'export_courses' ) );
@@ -24,7 +37,7 @@ class Export_Handler {
 	}
 
 	private function guard(): void {
-		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'manage_tutor' ) && ! current_user_can( 'tutor_instructor' ) ) {
+		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'manage_tutor' ) ) {
 			wp_die( esc_html__( 'ไม่มีสิทธิ์เข้าถึง', 'tutorlms-analytics' ), '', array( 'response' => 403 ) );
 		}
 		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), self::NONCE_ACTION ) ) {
@@ -48,10 +61,10 @@ class Export_Handler {
 
 		$this->send_headers( 'tutorlms-revenue-30days.csv' );
 		$output = fopen( 'php://output', 'w' );
-		fputcsv( $output, array( 'Date', 'Net Revenue (THB)' ) );
+		$this->write_row( $output, array( 'Date', 'Net Revenue (THB)' ) );
 		$labels = $stats['trend']['labels'] ?? array();
 		foreach ( $labels as $index => $date ) {
-			fputcsv( $output, array( $date, $stats['trend']['data'][ $index ] ?? 0 ) );
+			$this->write_row( $output, array( $date, $stats['trend']['data'][ $index ] ?? 0 ) );
 		}
 		fclose( $output );
 		exit;
@@ -65,9 +78,9 @@ class Export_Handler {
 
 		$this->send_headers( 'tutorlms-course-performance.csv' );
 		$output = fopen( 'php://output', 'w' );
-		fputcsv( $output, array( 'Course ID', 'Title', 'Learners', 'Completion Rate (%)', 'Avg Rating', 'Revenue (THB)', 'Health Score' ) );
+		$this->write_row( $output, array( 'Course ID', 'Title', 'Learners', 'Completion Rate (%)', 'Avg Rating', 'Revenue (THB)', 'Health Score' ) );
 		foreach ( $courses as $c ) {
-			fputcsv( $output, array( $c['id'], $c['title'], $c['learners'], $c['completion_rate'], $c['avg_rating'], $c['revenue'], $c['health'] ) );
+			$this->write_row( $output, array( $c['id'], $c['title'], $c['learners'], $c['completion_rate'], $c['avg_rating'], $c['revenue'], $c['health'] ) );
 		}
 		fclose( $output );
 		exit;
@@ -77,13 +90,13 @@ class Export_Handler {
 		$this->guard();
 
 		$provider = new Providers\Student_Provider();
-		$students = $provider->get_student_table( 0, 500 );
+		$students = $provider->get_student_table( 0 );
 
 		$this->send_headers( 'tutorlms-student-roster.csv' );
 		$output = fopen( 'php://output', 'w' );
-		fputcsv( $output, array( 'User ID', 'Name', 'Email', 'Courses Taken', 'Avg Progress (%)', 'Last Activity', 'Status' ) );
+		$this->write_row( $output, array( 'User ID', 'Name', 'Email', 'Courses Taken', 'Avg Progress (%)', 'Last Activity', 'Status' ) );
 		foreach ( $students as $s ) {
-			fputcsv( $output, array( $s['user_id'], $s['display_name'], $s['email'], $s['courses_taken'], $s['avg_progress'], $s['last_activity'], $s['status'] ) );
+			$this->write_row( $output, array( $s['user_id'], $s['display_name'], $s['email'], $s['courses_taken'], $s['avg_progress'], $s['last_activity'], $s['status'] ) );
 		}
 		fclose( $output );
 		exit;

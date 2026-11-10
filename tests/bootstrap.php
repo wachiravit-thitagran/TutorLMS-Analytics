@@ -186,6 +186,8 @@ class WP_REST_Response {
 		$this->status = $status;
 	}
 
+	public function get_status() { return $this->status; }
+
 	public function get_data() {
 		return $this->data;
 	}

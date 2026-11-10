@@ -21,9 +21,11 @@
 		if (lId) lessonId = parseInt(lId, 10);
 	}
 
-	function sendEvent(eventType, eventValue = '') {
+	function sendEvent(eventType, eventValue = '', keepalive = false) {
 		fetch(API_URL, {
 			method: 'POST',
+			credentials: 'same-origin',
+			keepalive,
 			headers: {
 				'Content-Type': 'application/json',
 				'X-WP-Nonce': NONCE
@@ -34,7 +36,9 @@
 				course_id: courseId,
 				lesson_id: lessonId
 			})
-		}).catch(console.error);
+		}).then(response => {
+			if (!response.ok) throw new Error('Analytics tracking request was rejected.');
+		}).catch(error => console.error('Analytics tracking failed:', error));
 	}
 
 	// 1. Track Page View
@@ -46,24 +50,31 @@
 	const videoElements = document.querySelectorAll('video, iframe'); // basic check, deeper integration with YouTube/Vimeo APIs is needed for true precision
 
 	// Simplified heuristic: If user stays on a lesson page that contains an iframe/video, pulse every 30 seconds
-	if (lessonId > 0 && videoElements.length > 0) {
+	function startHeartbeat() {
+		if (videoInterval || lessonId <= 0 || videoElements.length === 0) return;
 		videoInterval = setInterval(() => {
 			watchTime += 30;
 			sendEvent('video_watch_heartbeat', watchTime.toString());
 		}, 30000);
 	}
+	startHeartbeat();
 
 	// 3. Track Lesson Exit (Time spent)
 	let entryTime = Date.now();
-	window.addEventListener('beforeunload', () => {
-		let timeSpent = Math.floor((Date.now() - entryTime) / 1000);
-		// Use beacon for reliable exit tracking
-		navigator.sendBeacon(API_URL, JSON.stringify({
-			event_type: 'page_exit',
-			event_value: timeSpent.toString(),
-			course_id: courseId,
-			lesson_id: lessonId
-		}));
+	let exitSent = false;
+	window.addEventListener('pagehide', () => {
+		if (exitSent) return;
+		exitSent = true;
+		if (videoInterval) clearInterval(videoInterval);
+		videoInterval = null;
+		const timeSpent = Math.max(0, Math.floor((Date.now() - entryTime) / 1000));
+		sendEvent('page_exit', timeSpent.toString(), true);
 	});
-
+	window.addEventListener('pageshow', event => {
+		if (event.persisted) {
+			entryTime = Date.now();
+			exitSent = false;
+			startHeartbeat();
+		}
+	});
 })();

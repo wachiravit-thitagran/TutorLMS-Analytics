@@ -58,10 +58,25 @@ class RestApiTest extends TestCase {
 		$this->assertEquals( 'mobile', $insert['device_type'] );
 	}
 
+	public function test_tracking_storage_failure_is_observable(): void {
+		global $wpdb;
+		$previous = $wpdb;
+		$wpdb = new class extends Mock_WPDB {
+			public function insert( $table, $data, $format = null ) { return false; }
+		};
+		try {
+			$request = new WP_REST_Request();
+			$request->set_json_params( array( 'event_type' => 'page_exit', 'course_id' => 10 ) );
+			$response = $this->api->handle_track( $request );
+			$this->assertSame( 500, $response->get_status() );
+			$this->assertFalse( $response->get_data()['success'] );
+		} finally { $wpdb = $previous; }
+	}
+
 	public function test_parse_browser(): void {
 		$reflection = new ReflectionClass( $this->api );
 		$method = $reflection->getMethod( 'parse_browser' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) { $method->setAccessible( true ); }
 
 		$this->assertEquals( 'Chrome', $method->invoke( $this->api, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36' ) );
 		$this->assertEquals( 'Safari', $method->invoke( $this->api, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15' ) );
@@ -73,7 +88,7 @@ class RestApiTest extends TestCase {
 	public function test_parse_device(): void {
 		$reflection = new ReflectionClass( $this->api );
 		$method = $reflection->getMethod( 'parse_device' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) { $method->setAccessible( true ); }
 
 		$this->assertEquals( 'tablet', $method->invoke( $this->api, 'Mozilla/5.0 (iPad; CPU OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15' ) );
 		$this->assertEquals( 'mobile', $method->invoke( $this->api, 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)' ) );
